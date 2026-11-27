@@ -1,4 +1,4 @@
-/* 수박 게임 전용 스타일. 이 파일의 변경은 다른 게임에 영향을 주지 않아요. */
+/* 리치 게임 전용 스타일. 이 파일의 변경은 다른 게임에 영향을 주지 않아요. */
 body { overscroll-behavior: none; user-select: none; -webkit-user-select: none; }
 .app { position: relative; }
 .topbar h1 { flex: 1; min-width: 0; white-space: nowrap; }
