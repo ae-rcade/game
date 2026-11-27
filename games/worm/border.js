@@ -279,8 +279,6 @@ export function createBorder() {
   }
 
   return {
-    headAngle,
-    headRadius: CENTER + HEAD_OUT,
     draw(ctx, view, time) {
       // 맵 안쪽에서만 보고 있으면 그릴 것이 없어요.
       const farthest = Math.hypot(Math.max(Math.abs(view.left), Math.abs(view.right)), Math.max(Math.abs(view.top), Math.abs(view.bottom)));

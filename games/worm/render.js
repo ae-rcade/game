@@ -1,4 +1,4 @@
-// 맵, 먹이, 지렁이, 미니맵 그리기. 규칙은 바꾸지 않고 세계의 상태를 보여 주기만 해요.
+// 맵, 먹이, 지렁이 그리기. 규칙은 바꾸지 않고 세계의 상태를 보여 주기만 해요.
 import { RULES, KINDS, radiusFor } from './rules.js';
 import { segment } from './world.js';
 import { createBorder } from './border.js';
@@ -6,7 +6,6 @@ import { createBorder } from './border.js';
 const TILE = 160;
 const FOOD_SIZE = 22;
 const BIG_FOOD_SIZE = 28;
-const MINIMAP_SIZE = 96; // style.css의 #minimap 크기와 같아야 해요.
 
 // 오락실 바닥 무늬: 두 가지 색 칸과 작은 도트 별
 function floorTile() {
@@ -32,9 +31,8 @@ function floorTile() {
   return canvas;
 }
 
-export function createRenderer(canvas, minimap, sprites) {
+export function createRenderer(canvas, sprites) {
   const ctx = canvas.getContext('2d');
-  const map = minimap.getContext('2d');
   const floor = ctx.createPattern(floorTile(), 'repeat');
   const border = createBorder();
   let width = 1;
@@ -48,7 +46,6 @@ export function createRenderer(canvas, minimap, sprites) {
     height = canvas.clientHeight || 1;
     canvas.width = Math.round(width * ratio);
     canvas.height = Math.round(height * ratio);
-    minimap.width = minimap.height = Math.round(MINIMAP_SIZE * ratio);
   }
 
   function drawWorm(worm, view, time) {
@@ -150,39 +147,5 @@ export function createRenderer(canvas, minimap, sprites) {
     }
   }
 
-  function drawMinimap(world, player, time) {
-    const size = minimap.width;
-    const c = size / 2;
-    const k = (c - 6 * ratio) / RULES.mapRadius;
-    map.clearRect(0, 0, size, size);
-    map.fillStyle = 'rgba(36, 26, 74, .82)';
-    map.beginPath(); map.arc(c, c, c - 2 * ratio, 0, Math.PI * 2); map.fill();
-    // 둘레의 검은 뱀과 머리 위치
-    map.strokeStyle = '#9CEAFE';
-    map.lineWidth = 5 * ratio;
-    map.beginPath(); map.arc(c, c, c - 3 * ratio, 0, Math.PI * 2); map.stroke();
-    map.strokeStyle = '#08060F';
-    map.lineWidth = 3.5 * ratio;
-    map.stroke();
-    const turn = border.headAngle(time);
-    const hx = c + Math.cos(turn) * (c - 4 * ratio);
-    const hy = c + Math.sin(turn) * (c - 4 * ratio);
-    map.fillStyle = '#08060F';
-    map.strokeStyle = '#FF2E63';
-    map.lineWidth = 1.5 * ratio;
-    map.beginPath(); map.arc(hx, hy, 4 * ratio, 0, Math.PI * 2); map.fill(); map.stroke();
-    for (const worm of world.worms.values()) {
-      if (worm === player) continue;
-      map.fillStyle = '#C88DDD';
-      const dot = (1.6 + Math.min(2, worm.colors.length / 80)) * ratio;
-      map.fillRect(c + worm.x * k - dot, c + worm.y * k - dot, dot * 2, dot * 2);
-    }
-    if (player?.alive) {
-      map.fillStyle = '#FFFFFF';
-      map.strokeStyle = '#FF6F9F';
-      map.beginPath(); map.arc(c + player.x * k, c + player.y * k, 3.5 * ratio, 0, Math.PI * 2); map.fill(); map.stroke();
-    }
-  }
-
-  return { resize, draw, drawMinimap };
+  return { resize, draw };
 }

@@ -1,5 +1,6 @@
 {
-  "title": "지렁이 게임",
+  "title": "블랙맘바",
+  "icon": "icon.png",
   "description": "먹이를 먹고 가장 길게 살아남아요",
   "modes": [
     "멀티"

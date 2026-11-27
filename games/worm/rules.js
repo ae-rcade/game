@@ -7,7 +7,7 @@ export const RULES = {
   speed: 140,           // 초당 이동 거리
   boostSpeed: 280,
   boostSec: 1,          // 부스트 지속 시간
-  boostCooldownSec: 3,  // 부스트가 끝난 뒤 다시 쓰기까지
+  boostCooldownSec: 2,  // 부스트가 끝난 뒤 다시 쓰기까지
   turnRate: 4.4,        // 초당 회전(라디안). 몸이 굵어질수록 조금 느려져요.
   foodCount: 420,       // 맵에 항상 유지하는 먹이 수
   foodLimit: 900,       // 죽은 지렁이가 남긴 먹이까지 합친 최대 수

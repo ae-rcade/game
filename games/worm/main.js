@@ -5,16 +5,19 @@ import { createWorld } from './world.js';
 import { createBots } from './bots.js';
 import { loadSprites } from './sprites.js';
 import { createRenderer } from './render.js';
-import { createInput } from './input.js';
+import { createInput, blockZoom } from './input.js';
 
 const $ = (id) => document.getElementById(id);
 const NAME_KEY = 'ae-rcade.worm.name';
 const BEST_KEY = 'ae-rcade.worm.best';
 const STEP = 1 / 60;
 const DEATH_DELAY_MS = 900;
+const TOP = 5;
 
 const read = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
 const save = (key, value) => { try { localStorage.setItem(key, value); } catch { /* 저장이 막힌 브라우저 */ } };
+
+blockZoom(document.querySelector('.app'));
 
 async function main() {
   const world = createWorld();
@@ -22,7 +25,7 @@ async function main() {
   bots.fill();
 
   const canvas = $('board');
-  const renderer = createRenderer(canvas, $('minimap'), await loadSprites());
+  const renderer = createRenderer(canvas, await loadSprites());
   new ResizeObserver(() => renderer.resize()).observe($('game'));
   renderer.resize();
 
@@ -41,8 +44,8 @@ async function main() {
   function updateHud() {
     const list = ranked();
     const mine = list.indexOf(player);
-    const rows = list.slice(0, 10).map((worm, i) => [i + 1, worm]);
-    if (mine >= 10) rows.push([mine + 1, player]);
+    const rows = list.slice(0, TOP).map((worm, i) => [i + 1, worm]);
+    if (mine >= TOP) rows.push([mine + 1, player]); // 순위 밖이면 아래에 내 순위와 길이를 보여 줘요.
     $('ranking').replaceChildren(...rows.map(([rank, worm]) => {
       const li = document.createElement('li');
       if (worm === player) li.className = 'me';
@@ -53,8 +56,6 @@ async function main() {
       }
       return li;
     }));
-    if (player?.alive) $('length').textContent = player.colors.length;
-    renderer.drawMinimap(world, player, performance.now());
   }
 
   function updateBoost() {

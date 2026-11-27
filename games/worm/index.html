@@ -2,38 +2,33 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#C88DDD">
-  <title>지렁이 게임 · ae-rcade</title>
+  <title>블랙맘바 · ae-rcade</title>
   <link rel="stylesheet" href="../../shared/theme.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main class="app">
-    <header class="topbar">
-      <a class="btn-back" href="../../index.html#games" aria-label="게임 목록으로">◀</a>
-      <h1>지렁이 게임</h1>
-    </header>
     <section class="screen" id="game">
       <canvas id="board" aria-label="게임 화면. 끌어서 방향을 정하고, 빠르게 두 번 터치하면 부스트."></canvas>
       <div class="hud" id="hud" hidden>
-        <p class="length">길이<strong id="length">0</strong></p>
         <div class="ranking">
-          <h2>TOP 10</h2>
+          <h2>TOP 5</h2>
           <ol id="ranking"></ol>
         </div>
         <div class="boost" id="boost">
           <span>두 번 터치 · 부스트</span>
           <i><b id="boost-fill"></b></i>
         </div>
-        <canvas id="minimap" aria-label="미니맵"></canvas>
       </div>
+      <a class="btn-back" href="../../index.html#games" aria-label="게임 목록으로">◀</a>
       <p class="error" id="error" hidden>게임을 불러오지 못했어요.<br>새로고침해 주세요.</p>
     </section>
 
     <div class="modal" id="menu" role="dialog" aria-labelledby="menu-title">
       <div class="modal-box">
-        <h2 id="menu-title">지렁이 게임</h2>
+        <h2 id="menu-title">블랙맘바</h2>
         <form id="join">
           <input id="name" type="text" maxlength="10" placeholder="닉네임 (10자 이내)" aria-label="닉네임" autocomplete="off" enterkeyhint="go">
           <button type="submit" class="action primary" id="enter" disabled>▶ 입장하기</button>

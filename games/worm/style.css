@@ -1,15 +1,15 @@
-/* 지렁이 게임 전용 스타일. 이 파일의 변경은 다른 게임에 영향을 주지 않아요. */
+/* 블랙맘바(지렁이 게임) 전용 스타일. 이 파일의 변경은 다른 게임에 영향을 주지 않아요. */
 body { overscroll-behavior: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 .app { position: relative; }
-#game { margin: 8px 8px 10px; overflow: hidden; background: #1B1238; }
-#board { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 17px; touch-action: none; cursor: pointer; }
+/* 두 번 터치해도 화면이 확대되지 않게 해요. */
+.app, .app * { touch-action: manipulation; }
+#game { margin: 5px; overflow: hidden; background: #1B1238; border-width: 3px; border-radius: 16px; }
+#board { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 13px; touch-action: none; cursor: pointer; }
+#game .btn-back { position: absolute; top: 10px; left: 10px; z-index: 11; } /* 입장·결과 화면에서도 눌려요. */
 .error { position: relative; text-align: center; line-height: 1.8; }
 
 /* 게임 중 정보. 터치는 모두 아래의 게임 화면으로 지나가요. */
 .hud { position: absolute; inset: 0; pointer-events: none; }
-.length { position: absolute; top: 10px; left: 10px; display: flex; align-items: baseline; gap: 8px; padding: 6px 12px; font-size: 12px;
-  color: var(--ink); background: var(--cyan); border: 3px solid var(--ink); border-radius: 12px; }
-.length strong { font-size: 22px; }
 .ranking { position: absolute; top: 10px; right: 10px; width: 138px; padding: 6px 8px; font-size: 11px;
   background: rgba(36, 26, 74, .68); border: 2px solid rgba(233, 211, 250, .75); border-radius: 12px; }
 .ranking h2 { margin-bottom: 3px; font-size: 11px; text-align: center; color: var(--cyan); }
@@ -17,8 +17,7 @@ body { overscroll-behavior: none; user-select: none; -webkit-user-select: none; 
 .ranking li { display: grid; grid-template-columns: 17px 1fr auto; gap: 3px; line-height: 15px; white-space: nowrap; }
 .ranking li span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; }
 .ranking li.me { color: var(--cyan); font-weight: 700; }
-.ranking li.me:nth-child(11) { margin-top: 2px; border-top: 1px dashed var(--lilac); }
-#minimap { position: absolute; right: 10px; bottom: 10px; width: 96px; height: 96px; }
+.ranking li.me:nth-child(6) { margin-top: 2px; border-top: 1px dashed var(--lilac); }
 .boost { position: absolute; left: 10px; bottom: 10px; width: 150px; padding: 7px 9px; font-size: 11px; text-align: center;
   color: var(--lilac); background: rgba(36, 26, 74, .78); border: 2px solid var(--lilac); border-radius: 12px; }
 .boost i { display: block; height: 7px; margin-top: 6px; overflow: hidden; background: #ffffff2b; border-radius: 4px; }
@@ -27,7 +26,7 @@ body { overscroll-behavior: none; user-select: none; -webkit-user-select: none; 
 .boost.ready b, .boost.active b { background: var(--cyan); }
 
 /* 입장·결과 화면 */
-.modal { position: absolute; inset: 0; top: calc(env(safe-area-inset-top) + 60px); z-index: 10; display: flex; padding: 18px 22px 22px;
+.modal { position: absolute; inset: 0; z-index: 10; display: flex; padding: calc(env(safe-area-inset-top) + 18px) 22px calc(env(safe-area-inset-bottom) + 22px);
   overflow-y: auto; overscroll-behavior: contain; background: rgba(36, 26, 74, .45); }
 .modal.clear { background: rgba(36, 26, 74, .3); }
 .modal-box { width: 100%; margin: auto; display: flex; flex-direction: column; gap: 14px; padding: 20px 16px; text-align: center;
