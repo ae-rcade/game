@@ -23,6 +23,10 @@
   background: #8A6BC9; border: 3px solid var(--cyan); border-radius: 12px;
   box-shadow: 0 0 0 3px var(--ink), 0 0 0 6px var(--lilac), 0 10px 0 3px var(--ink); animation: pulse 1.4s steps(2, jump-none) infinite; }
 .start:active { transform: translateY(5px); box-shadow: 0 0 0 3px var(--ink), 0 0 0 6px var(--lilac), 0 5px 0 3px var(--ink); }
+.lang { position: relative; z-index: 2; margin-top: 5cqh; display: flex; gap: 10px; }
+.lang button { min-width: 96px; padding: 9px 12px; font: inherit; font-size: 14px; font-weight: 700; color: var(--white); cursor: pointer;
+  background: var(--purple); border: 3px solid var(--ink); border-radius: 10px; box-shadow: 0 4px 0 var(--ink); }
+.lang button[aria-pressed="true"] { color: var(--ink); background: var(--cyan); }
 .skyline { position: absolute; left: 0; bottom: 0; width: 100%; max-height: 38cqh; object-fit: cover; object-position: top; border-radius: 0 0 16px 16px; }
 .spark, .planet { position: absolute; image-rendering: pixelated; }
 .spark { width: 14px; animation: twinkle 2.4s ease-in-out infinite; }

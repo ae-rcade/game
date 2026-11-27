@@ -76,6 +76,12 @@ if (location.hash === '#games' && arrival === 'navigate' && !fromGame) {
   history.replaceState(null, '', location.pathname + location.search);
 }
 
+// 언어 선택 (shared/i18n.js)
+for (const button of document.querySelectorAll('.lang button')) {
+  button.setAttribute('aria-pressed', button.dataset.lang === window.i18n.lang);
+  button.addEventListener('click', () => window.i18n.set(button.dataset.lang));
+}
+
 window.addEventListener('hashchange', route);
 route();
 loadGames();

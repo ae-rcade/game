@@ -56,4 +56,9 @@ img { display: block; }
     display: grid; place-items: center; font-size: 18px; color: var(--cyan);
   }
 }
+/* 영어를 골랐을 때 (shared/i18n.js) */
+html[lang="en"] .topbar h1 { font-size: 21px; }
+@media (orientation: landscape) and (pointer: coarse) and (max-height: 600px) {
+  html[lang="en"] body::after { content: "↻  Please rotate your phone upright"; }
+}
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
