@@ -1,5 +1,5 @@
 // 싱글 모드: 90초 타임어택
-import { DURATION_MS, COUNTDOWN_MS, pointsFor, isCorrect, shuffle } from './quiz.js';
+import { DURATION_MS, COUNTDOWN_MS, LINE_DELAYS_MS, pointsFor, isCorrect, shuffle } from './quiz.js';
 
 const $ = (id) => document.getElementById(id);
 const BEST_KEY = 'ae-rcade.lyrics-quiz.best';
@@ -10,7 +10,7 @@ function readBest() {
 const name = (q) => (q.artist ? `${q.title} - ${q.artist}` : q.title);
 
 export function createSingle({ onFinish }) {
-  let run = null; // { questions, index, opened, score, correct, history, startsAt, endsAt, timer }
+  let run = null; // { questions, index, opened, unlockAt, score, correct, history, startsAt, endsAt, timer }
 
   const question = () => run.questions[run.index];
   const playing = () => run && performance.now() >= run.startsAt;
@@ -20,24 +20,52 @@ export function createSingle({ onFinish }) {
     $('feedback').className = `feedback ${kind}`;
   }
 
-  function addLine() {
-    const item = document.createElement('li');
-    item.textContent = question().lines[run.opened];
-    $('lines').append(item);
+  // 다음 줄을 열고, 그다음 줄의 대기 시간을 시작해요.
+  function openLine() {
+    const box = $('lines').children[run.opened].firstChild;
+    box.textContent = question().lines[run.opened];
     run.opened++;
-    const more = run.opened < question().lines.length;
-    $('more').disabled = !more;
-    $('more').textContent = more ? `＋ 다음 줄 보기 (맞히면 ${pointsFor(run.opened + 1)}점)` : '마지막 줄까지 열었어요';
+    run.unlockAt = performance.now() + (LINE_DELAYS_MS[run.opened] || 0);
     $('worth').textContent = `맞히면 ${pointsFor(run.opened)}점`;
-    $('card').scrollTop = $('card').scrollHeight;
+    updateLocks();
+    box.scrollIntoView({ block: 'nearest' });
+  }
+
+  // 아직 가려진 줄의 표시(?, ?(n초))와 패스 가능 여부
+  function updateLocks() {
+    const wait = Math.ceil((run.unlockAt - performance.now()) / 1000);
+    [...$('lines').children].forEach((item, i) => {
+      const box = item.firstChild;
+      const hidden = i >= run.opened;
+      const next = i === run.opened;
+      const ready = next && wait <= 0;
+      box.className = hidden ? (ready ? 'ready' : 'locked') : 'open';
+      box.setAttribute('aria-disabled', !ready); // disabled를 쓰면 누를 때 키보드가 닫힐 수 있어요.
+      if (!hidden) { box.removeAttribute('aria-label'); box.removeAttribute('aria-disabled'); return; }
+      const text = next && wait > 0 ? `?(${wait}초)` : '?';
+      if (box.textContent !== text) box.textContent = text;
+      box.setAttribute('aria-label', ready ? `${i + 1}번째 줄 열기` : `${i + 1}번째 줄은 아직 열 수 없어요`);
+    });
+    // 준비된 줄을 모두 연 뒤에만 패스할 수 있어요.
+    $('pass').setAttribute('aria-disabled', run.opened < question().lines.length);
   }
 
   function showQuestion() {
     run.opened = 0;
     $('number').textContent = `문제 ${run.index + 1}`;
-    $('lines').replaceChildren();
+    $('lines').replaceChildren(...question().lines.map((_, i) => {
+      const item = document.createElement('li');
+      const box = document.createElement('button');
+      box.type = 'button';
+      box.addEventListener('click', () => {
+        if (playing() && i === run.opened && performance.now() >= run.unlockAt) openLine();
+      });
+      item.append(box);
+      return item;
+    }));
     $('answer').value = '';
-    addLine();
+    openLine();
+    $('card').scrollTop = 0;
   }
 
   function status() {
@@ -69,6 +97,7 @@ export function createSingle({ onFinish }) {
     const waiting = now < run.startsAt;
     $('countdown').hidden = !waiting;
     $('card').classList.toggle('waiting', waiting);
+    updateLocks();
     if (waiting) $('countdown').textContent = Math.ceil((run.startsAt - now) / 1000);
     const seconds = Math.ceil(Math.max(0, run.endsAt - Math.max(now, run.startsAt)) / 1000);
     $('time').textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
@@ -97,16 +126,13 @@ export function createSingle({ onFinish }) {
       }
     });
   });
-  $('more').addEventListener('click', () => {
-    if (playing() && run.opened < question().lines.length) addLine();
-  });
   $('pass').addEventListener('click', () => {
-    if (!playing()) return;
+    if (!playing() || run.opened < question().lines.length) return;
     say(`패스! 정답은 "${question().title}"`);
     advance(false);
   });
   // 버튼을 눌러도 휴대폰 키보드가 닫히지 않게 해요.
-  for (const id of ['more', 'pass', 'submit']) $(id).addEventListener('mousedown', (e) => e.preventDefault());
+  for (const id of ['card', 'pass', 'submit']) $(id).addEventListener('mousedown', (e) => e.preventDefault());
 
   return {
     start(questions) {

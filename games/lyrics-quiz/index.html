@@ -28,8 +28,9 @@
       <ul class="rules">
         <li id="rule-time"></li>
         <li>가사를 보고 노래 제목을 직접 입력해요</li>
-        <li>가사는 한 줄씩 열 수 있고, 적게 볼수록 점수가 높아요<small id="rule-points"></small></li>
-        <li>틀려도 다시 입력할 수 있고, 모르면 패스해요</li>
+        <li>? 칸을 눌러 가사를 열어요. 적게 볼수록 점수가 높아요<small id="rule-points"></small></li>
+        <li id="rule-wait"></li>
+        <li>틀려도 다시 입력할 수 있어요. 패스는 가사를 모두 연 뒤에 가능해요</li>
       </ul>
       <p class="note" id="load-message" aria-live="polite"></p>
       <button type="button" class="action" id="reload" hidden>다시 불러오기</button>
@@ -47,7 +48,6 @@
         <div class="card" id="card">
           <p class="number"><span id="number"></span><span id="worth"></span></p>
           <ol id="lines" aria-live="polite"></ol>
-          <button type="button" class="action" id="more"></button>
         </div>
         <p class="countdown" id="countdown" aria-live="assertive" hidden></p>
       </section>

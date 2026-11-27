@@ -1,9 +1,12 @@
 // 화면과 무관한 퀴즈 규칙: 표(CSV) 읽기, 정답 판정, 점수
 export const DURATION_MS = 90_000;           // 타임어택 시간
 export const COUNTDOWN_MS = 3000;
-export const POINTS = [100, 70, 50, 30];     // 가사를 1, 2, 3, 4줄 이상 열었을 때 점수
+export const POINTS = [100, 70, 40, 10];     // 가사를 1, 2, 3, 4줄 열었을 때 점수
+// 각 줄을 열 수 있을 때까지, 앞 줄을 연 뒤 기다리는 시간. 1번째 줄은 처음부터 보여요.
+export const LINE_DELAYS_MS = [0, 0, 3000, 5000];
+export const MAX_LINES = LINE_DELAYS_MS.length;
 
-export const pointsFor = (opened) => POINTS[Math.min(opened, POINTS.length) - 1];
+export const pointsFor = (opened) => POINTS[opened - 1];
 
 export function parseCSV(text) {
   const rows = [];
@@ -40,7 +43,7 @@ export function toQuestions(rows) {
     aliases: get(row, alias).split('|').map((a) => a.trim()).filter(Boolean),
     artist: get(row, artist),
     // 한 칸 안에서 줄을 바꾼 것도 각각 한 줄로 보여줘요.
-    lines: lyrics.flatMap((i) => get(row, i).split(/\r?\n/)).map((l) => l.trim()).filter(Boolean),
+    lines: lyrics.flatMap((i) => get(row, i).split(/\r?\n/)).map((l) => l.trim()).filter(Boolean).slice(0, MAX_LINES),
   })).filter((q) => q.title && q.lines.length);
 }
 

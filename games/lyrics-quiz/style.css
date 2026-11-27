@@ -35,8 +35,11 @@ h2 { font-size: 24px; color: var(--cyan); text-align: center; }
 .card.waiting { visibility: hidden; }
 .number { display: flex; justify-content: space-between; font-size: 13px; color: var(--cyan); }
 #lines { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-#lines li { padding: 12px 10px; text-align: center; font-size: 18px; line-height: 1.6; color: var(--ink); background: var(--white); border-radius: 12px; overflow-wrap: anywhere; }
-#more { font-size: 13px; }
+#lines button { width: 100%; min-height: 54px; padding: 12px 10px; font: 18px/1.6 Galmuri, system-ui, sans-serif; text-align: center; word-break: keep-all; overflow-wrap: anywhere; border: 3px solid transparent; border-radius: 12px; }
+#lines .open { color: var(--ink); background: var(--white); }
+#lines .ready { color: var(--ink); background: var(--cyan); border-color: var(--ink); box-shadow: 0 4px 0 var(--ink); font-weight: 700; cursor: pointer; }
+#lines .locked { color: var(--lilac); background: rgba(43, 33, 86, .35); border: 3px dashed var(--lilac); }
+.answer .action[aria-disabled="true"] { opacity: .45; cursor: default; }
 .countdown { position: absolute; inset: 0; display: grid; place-items: center; font-size: 64px; font-weight: 700; color: var(--cyan); text-shadow: 4px 4px 0 var(--ink); }
 .feedback { min-height: 22px; padding: 0 14px; text-align: center; font-size: 13px; line-height: 22px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 1px 1px 0 var(--ink); }
 .feedback.good { color: #FFF3B0; font-weight: 700; }
@@ -57,7 +60,9 @@ h2 { font-size: 24px; color: var(--cyan); text-align: center; }
 .app.compact .status strong { font-size: 16px; }
 .app.compact .screen { margin-top: 6px; }
 .app.compact .answer { padding-bottom: 8px; }
-.app.compact #lines li { padding-block: 7px; font-size: 16px; }
+.app.compact .card { gap: 6px; padding-block: 8px; }
+.app.compact #lines { gap: 6px; }
+.app.compact #lines button { min-height: 40px; padding-block: 5px; font-size: 15px; }
 /* 키보드 때문에 화면이 가로 비율이 되어도 '세로로 돌려주세요' 안내가 뜨지 않게 해요. */
 body:has(#answer:focus) .app { visibility: visible; }
 body:has(#answer:focus)::after { display: none; }
