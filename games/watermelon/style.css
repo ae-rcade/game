@@ -1,2 +1,21 @@
 /* 수박 게임 전용 스타일. 이 파일의 변경은 다른 게임에 영향을 주지 않아요. */
-.game-icon { width: 112px; image-rendering: pixelated; }
+body { overscroll-behavior: none; user-select: none; -webkit-user-select: none; }
+.restart { margin-left: auto; font: 700 24px Galmuri, sans-serif; cursor: pointer; }
+.status { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 14px 0; }
+.status p { display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 56px; padding: 6px;
+  font-size: 12px; color: var(--ink); background: var(--lilac); border: 3px solid var(--ink); border-radius: 12px; }
+.status strong { font-size: 20px; }
+.status img { width: 26px; height: 26px; image-rendering: pixelated; }
+#game { gap: 0; overflow: hidden; }
+#stage { position: absolute; inset: 6px; display: flex; align-items: flex-end; justify-content: center; }
+#field { border-bottom: 3px solid var(--lilac); border-inline: 1px dashed #ffffff55; }
+#board { display: block; width: 100%; height: 100%; touch-action: none; cursor: pointer; }
+.over { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+  text-align: center; line-height: 1.8; background: #2B2156cc; border-radius: 18px; font-size: 18px; }
+.over button { padding: 12px 24px; font: 700 18px Galmuri, sans-serif; color: var(--ink); background: var(--cyan);
+  border: 3px solid var(--ink); border-radius: 12px; box-shadow: 0 5px 0 var(--ink); cursor: pointer; }
+.order { list-style: none; display: flex; align-items: center; justify-content: center; gap: 2px; margin: 0 14px 12px; padding: 8px 4px;
+  background: var(--lilac); border: 3px solid var(--ink); border-radius: 14px; }
+.order li { flex: 0 1 34px; display: flex; justify-content: center; }
+.order img { width: 100%; image-rendering: pixelated; }
+.order li:nth-child(-n+4) img { width: 76%; }

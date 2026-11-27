@@ -13,13 +13,29 @@
     <header class="topbar">
       <a class="btn-back" href="../../index.html#games" aria-label="게임 목록으로">◀</a>
       <h1>수박 게임</h1>
+      <button type="button" class="btn-back restart" id="restart" aria-label="다시 시작">↻</button>
     </header>
+    <div class="status">
+      <p>점수<strong id="score">0</strong></p>
+      <p>최고<strong id="best">0</strong></p>
+      <p>다음<img id="next" alt="다음 캐릭터"></p>
+    </div>
     <section class="screen" id="game">
-      <img class="game-icon" src="icon.svg" alt="">
-      <p class="soon">COMING SOON</p>
-      <p>게임을 준비하고 있어요</p>
+      <div id="stage">
+        <div id="field">
+          <canvas id="board" aria-label="게임 판. 누른 채 좌우로 움직이고 손을 떼면 떨어져요."></canvas>
+        </div>
+      </div>
+      <div class="over" id="over" hidden>
+        <p class="soon">GAME OVER</p>
+        <p>점수 <span id="final">0</span></p>
+        <button type="button" id="retry">▶ 다시 하기</button>
+      </div>
+      <p class="over" id="error" hidden>게임을 불러오지 못했어요.<br>새로고침해 주세요.</p>
     </section>
+    <ol class="order" id="order" aria-label="합쳐지는 순서"></ol>
   </main>
+  <script src="vendor/matter.min.js"></script>
   <script type="module" src="main.js"></script>
 </body>
 </html>
