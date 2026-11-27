@@ -51,3 +51,12 @@ dl { display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 6px; }
 dl div { padding: 8px 4px; color: var(--ink); background: var(--white); border-radius: 10px; }
 dt { font-size: 11px; }
 dd { margin-top: 4px; font-size: 14px; font-weight: 700; }
+
+#ping {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  color: #fff;
+  font-size: 12px;
+  pointer-events: none;
+}

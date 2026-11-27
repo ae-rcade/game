@@ -166,6 +166,13 @@ async function main() {
   $('name').value = read(NAME_KEY) || '';
   $('enter').disabled = false;
 
+  // 주소 끝에 ?ping 을 붙이면 서버를 다녀오는 시간을 보여 줘요.
+  const pingBox = online && new URLSearchParams(location.search).has('ping') ? document.createElement('div') : null;
+  if (pingBox) {
+    pingBox.id = 'ping';
+    $('game').append(pingBox);
+  }
+
   let last = performance.now();
   let hudWait = 0;
   function frame(now) {
@@ -188,6 +195,7 @@ async function main() {
     if (hudWait <= 0 && !$('hud').hidden) {
       hudWait = 0.2;
       updateHud();
+      if (pingBox) pingBox.textContent = online.ping === null ? '' : `지연 ${Math.round(online.ping)}ms`;
     }
     requestAnimationFrame(frame);
   }

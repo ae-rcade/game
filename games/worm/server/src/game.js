@@ -14,7 +14,8 @@ const DEAD_IDLE_MS = 60_000;     // 죽은 채(또는 시작하지 않고) 이�
 const MESSAGES_PER_SECOND = 40;
 const TOP = 5;
 
-export function createGame({ random } = {}) {
+// now: 실제 시각(ms). 조종 신호가 두 번의 계산 사이 언제 왔는지 알 때만 써요.
+export function createGame({ random, now } = {}) {
   let added = [];
   let removed = [];
   const world = createWorld({
@@ -29,9 +30,10 @@ export function createGame({ random } = {}) {
   const sent = new WeakMap(); // 지렁이 → 지난번까지 보낸 마디 수
   let time = 0;
   let ticks = 0;
+  let tickedAt = now?.();
 
   function connect(send, close) {
-    const player = { send, close, worm: null, x: 0, y: 0, known: new Set(), heard: time, downSince: time, death: null, window: time, count: 0 };
+    const player = { send, close, worm: null, x: 0, y: 0, known: new Set(), heard: time, downSince: time, death: null, window: time, count: 0, ack: null };
     players.add(player);
     send(JSON.stringify({ t: 'w', f: [...world.foods.values()].map(packFood) }));
     return player;
@@ -67,6 +69,13 @@ export function createGame({ random } = {}) {
       world.steer(player.worm, message.a);
     } else if (message?.t === 'b') {
       world.boost(player.worm);
+    } else {
+      return;
+    }
+    // 어느 신호까지 반영했는지 알려 주면, 화면이 내 지렁이를 미리 움직인 위치와 맞춰 볼 수 있어요.
+    if (Number.isInteger(message.s)) {
+      const offset = now ? Math.max(0, Math.min(200, now() - tickedAt)) : 0;
+      player.ack = [message.s, time + offset];
     }
   }
 
@@ -99,6 +108,7 @@ export function createGame({ random } = {}) {
 
   function tick(dt) {
     time += dt * 1000;
+    tickedAt = now?.();
     ticks++;
     for (const player of players) {
       if (time - player.heard > IDLE_MS || (!player.worm && time - player.downSince > DEAD_IDLE_MS)) kick(player, 4001, 'idle');
@@ -141,6 +151,8 @@ export function createGame({ random } = {}) {
       if (worm) {
         message.y = worm.id;
         message.b = [r2(worm.boostLeft), r2(worm.cooldown)];
+        // [마지막으로 반영한 신호 번호, 그 신호가 온 뒤 지난 시간(ms)]
+        if (player.ack) message.k = [player.ack[0], Math.round(time - player.ack[1])];
       }
       if (player.death) {
         message.d = player.death;
