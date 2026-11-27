@@ -2,7 +2,7 @@
 import { DurableObject } from 'cloudflare:workers';
 
 // 모드별 최대 플레이 시간(초). id는 ../../modes.js와 같아야 해요.
-const MODES = { endless: Infinity, time120: 120 };
+const MODES = { endless: Infinity, time90: 90 };
 const TOP = 10;
 const NAME_MAX = 10;
 const SESSION_LIFE_MS = 24 * 60 * 60 * 1000;
@@ -30,8 +30,6 @@ export class Ranking extends DurableObject {
         name TEXT NOT NULL, score INTEGER NOT NULL, created INTEGER NOT NULL);
       CREATE INDEX IF NOT EXISTS scores_rank ON scores (mode, score DESC, id);
     `);
-    // 한 번만 쓰는 정리: 요청받은 시험 기록 삭제
-    this.sql.exec("DELETE FROM scores WHERE mode = 'time120' AND name = 'test_1' AND score = 1099");
   }
 
   allow(address) {
