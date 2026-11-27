@@ -1,5 +1,5 @@
 // 게임 규칙과 물리. 화면 그리기·입력은 main.js에서 담당해요.
-const { Engine, Bodies, Body, Composite, Events } = window.Matter;
+const { Engine, Bodies, Body, Composite, Events, Vertices } = window.Matter;
 
 export const WIDTH = 360;
 export const HEIGHT = 520;
@@ -13,7 +13,8 @@ const COOLDOWN_MS = 500;
 const BOUNCE = { restitution: 0.65, friction: 0.15, frictionStatic: 0.3, frictionAir: 0.008 };
 export const STEP_MS = 1000 / 60;
 
-export function createGame(levels, { random = Math.random, onMerge = () => {} } = {}) {
+// shapes[단계]는 반지름 1 기준의 윤곽 좌표예요. 없으면 원으로 판정해요.
+export function createGame(levels, { shapes = [], random = Math.random, onMerge = () => {} } = {}) {
   const engine = Engine.create({ positionIterations: 10, velocityIterations: 8 });
   const wall = (x, y, w, h) => Bodies.rectangle(x, y, w, h, { isStatic: true, label: 'wall' });
   Composite.add(engine.world, [
@@ -29,12 +30,21 @@ export function createGame(levels, { random = Math.random, onMerge = () => {} } 
 
   function add(level, x, y) {
     const r = levels[level].radius;
-    const body = Bodies.circle(
-      Math.min(WIDTH - r, Math.max(r, x)), Math.min(HEIGHT - r, y), r,
-      { ...BOUNCE, label: 'piece' },
-      48,
-    );
-    Object.assign(body, { level, born: state.time, overTime: 0, merged: false });
+    const px = Math.min(WIDTH - r, Math.max(r, x));
+    const py = Math.min(HEIGHT - r, y);
+    const options = { ...BOUNCE, label: 'piece' };
+    let body;
+    // offset: 물리 중심에서 본 그림 중심의 위치
+    let offset = { x: 0, y: 0 };
+    if (shapes[level]) {
+      const points = shapes[level].map((p) => ({ x: p.x * r, y: p.y * r }));
+      const centre = Vertices.centre(points);
+      offset = { x: -centre.x, y: -centre.y };
+      body = Bodies.fromVertices(px + centre.x, py + centre.y, [points], options);
+    } else {
+      body = Bodies.circle(px, py, r, options, 48);
+    }
+    Object.assign(body, { level, radius: r, offset, born: state.time, overTime: 0, merged: false });
     pieces.add(body);
     Composite.add(engine.world, body);
     return body;
@@ -76,7 +86,7 @@ export function createGame(levels, { random = Math.random, onMerge = () => {} } 
 
   // 꽉 눌린 캐릭터가 벽이나 바닥을 뚫고 나가면 안으로 되돌려요.
   function keepInside(p) {
-    const half = p.circleRadius / 2;
+    const half = p.radius / 2;
     const x = Math.min(WIDTH - half, Math.max(half, p.position.x));
     const y = Math.min(HEIGHT - half, p.position.y);
     if (x === p.position.x && y === p.position.y) return;
@@ -105,7 +115,8 @@ export function createGame(levels, { random = Math.random, onMerge = () => {} } 
       let worst = 0;
       for (const p of pieces) {
         keepInside(p);
-        const high = state.time - p.born > GRACE_MS && p.position.y - p.circleRadius < DANGER_Y;
+        const top = Math.min(...p.vertices.map((v) => v.y));
+        const high = state.time - p.born > GRACE_MS && top < DANGER_Y;
         p.overTime = high ? p.overTime + STEP_MS : 0;
         worst = Math.max(worst, p.overTime);
       }

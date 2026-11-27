@@ -1,12 +1,13 @@
 // 화면 그리기와 터치 입력. 게임 규칙은 engine.js에 있어요.
 import { createGame, WIDTH, HEIGHT, DANGER_Y, DROP_Y, STEP_MS } from './engine.js';
+import { analyze } from './shape.js';
 
 const $ = (id) => document.getElementById(id);
 const canvas = $('board');
 const ctx = canvas.getContext('2d');
 const BEST_KEY = 'ae-rcade.watermelon.best';
 
-let levels, sprites, thumbs, game, aimX = WIDTH / 2, aiming = false, effects = [], best = readBest();
+let levels, sprites, shapes, thumbs, game, aimX = WIDTH / 2, aiming = false, effects = [], best = readBest();
 
 function readBest() {
   try { return Number(localStorage.getItem(BEST_KEY)) || 0; } catch { return 0; }
@@ -35,17 +36,16 @@ function numberBall(number) {
   return c;
 }
 
-function drawPiece(level, x, y, angle = 0) {
+function drawPiece(level, x, y, angle = 0, offset = { x: 0, y: 0 }) {
   const r = levels[level].radius;
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(angle);
-  // 원 밖은 잘라내고, 정사각형이 아닌 그림은 가운데를 기준으로 원을 채워요.
   const img = sprites[level];
-  const side = Math.min(img.width, img.height);
-  ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.clip();
-  ctx.imageSmoothingEnabled = side > 128; // 작은 픽셀 그림은 또렷하게, 큰 사진은 부드럽게
-  ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, -r, -r, r * 2, r * 2);
+  ctx.translate(offset.x, offset.y);
+  if (!shapes[level]) { ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.clip(); }
+  ctx.imageSmoothingEnabled = img.width > 128; // 작은 픽셀 그림은 또렷하게, 큰 사진은 부드럽게
+  ctx.drawImage(img, -r, -r, r * 2, r * 2);
   ctx.restore();
 }
 
@@ -72,7 +72,7 @@ function draw() {
   }
   ctx.setLineDash([]);
 
-  for (const p of game.pieces) drawPiece(p.level, p.position.x, p.position.y, p.angle);
+  for (const p of game.pieces) drawPiece(p.level, p.position.x, p.position.y, p.angle, p.offset);
 
   ctx.textAlign = 'center';
   ctx.font = '700 18px Galmuri';
@@ -95,6 +95,7 @@ function hud() {
   $('best').textContent = best;
   const src = thumbs[state.next];
   if ($('next').getAttribute('src') !== src) $('next').src = src;
+  $('next').classList.toggle('round', !shapes[state.next]);
   if (state.over && $('over').hidden) {
     $('final').textContent = state.score;
     $('over').hidden = false;
@@ -104,7 +105,7 @@ function hud() {
 
 function start() {
   effects = [];
-  game = createGame(levels, { onMerge: (e) => effects.push({ ...e, start: game.state.time }) });
+  game = createGame(levels, { shapes, onMerge: (e) => effects.push({ ...e, start: game.state.time }) });
   $('over').hidden = true;
   aimX = WIDTH / 2;
   aiming = false;
@@ -142,8 +143,10 @@ async function init() {
     if (!res.ok) throw new Error(`characters.json: ${res.status}`);
     levels = await res.json();
     const images = await Promise.all(levels.map((l) => loadImage(l.image)));
-    sprites = images.map((img, i) => img || numberBall(i + 1));
-    thumbs = images.map((img, i) => (img ? levels[i].image : sprites[i].toDataURL()));
+    const parts = images.map((img, i) => analyze(img || numberBall(i + 1)));
+    sprites = parts.map((p) => p.sprite);
+    shapes = parts.map((p) => p.hull);
+    thumbs = sprites.map((c) => c.toDataURL());
   } catch (error) {
     console.error(error);
     $('error').hidden = false;
@@ -154,6 +157,7 @@ async function init() {
     const img = document.createElement('img');
     img.src = thumbs[i];
     img.alt = level.name;
+    img.classList.toggle('round', !shapes[i]);
     item.append(img);
     $('order').append(item);
   }
