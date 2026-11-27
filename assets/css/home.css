@@ -48,7 +48,9 @@ li:nth-child(4n+1) .card, li:nth-child(4n+4) .card { background: var(--cyan); }
 .card p { font-size: 12px; line-height: 1.5; }
 .tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: auto; }
 .tags span { font-size: 11px; padding: 2px 6px; border-radius: 6px; background: var(--white); }
-.badge { font-style: normal; position: absolute; top: -8px; right: -4px; font-size: 11px; padding: 2px 6px; background: var(--ink); color: var(--white); border-radius: 6px; }
+.game-grid li .card.soon { justify-content: center; background: transparent; color: var(--lilac); border: 3px dashed var(--lilac); box-shadow: none; }
+.card.soon:active { transform: none; }
+.card.soon span { width: 68px; height: 68px; display: grid; place-items: center; font-size: 40px; font-weight: 700; }
 .notice { grid-column: 1 / -1; text-align: center; padding: 32px 8px; line-height: 1.8; }
 
 /* 조작대 */

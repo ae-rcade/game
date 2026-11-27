@@ -30,10 +30,18 @@ async function loadCard(id) {
   const tags = el('div', '', 'tags');
   for (const mode of Array.isArray(meta.modes) ? meta.modes : []) tags.append(el('span', mode));
   link.append(icon, el('strong', meta.title), el('p', meta.description), tags);
-  if (!meta.ready) link.append(el('em', '준비 중', 'badge'));
 
   const item = el('li');
   item.append(link);
+  return { item, ready: meta.ready === true };
+}
+
+// 아직 열지 않은 게임들 대신 보여 주는 칸
+function comingSoon() {
+  const box = el('div', '', 'card soon');
+  box.append(el('span', '?'), el('strong', '준비 중'), el('p', '새 게임을 기다려 주세요'));
+  const item = el('li');
+  item.append(box);
   return item;
 }
 
@@ -42,8 +50,10 @@ async function loadGames() {
     const { games } = await readJson('games/list.json');
     const results = await Promise.allSettled(games.map(loadCard));
     results.filter((r) => r.status === 'rejected').forEach((r) => console.warn(r.reason));
-    const cards = results.filter((r) => r.status === 'fulfilled').map((r) => r.value);
+    const loaded = results.filter((r) => r.status === 'fulfilled').map((r) => r.value);
+    const cards = loaded.filter((c) => c.ready).map((c) => c.item);
     if (!cards.length) throw new Error('표시할 게임이 없어요');
+    if (cards.length < loaded.length) cards.push(comingSoon());
     grid.replaceChildren(...cards);
   } catch (error) {
     console.error(error);
@@ -56,6 +66,14 @@ function route() {
   title.hidden = showLobby;
   lobby.hidden = !showLobby;
   if (showLobby) lobby.querySelector('h2').focus({ preventScroll: true });
+}
+
+// 링크로 처음 들어오면 주소에 #games가 있어도 시작 화면부터 보여 줘요.
+// 게임에서 돌아온 경우(뒤로가기 포함)와 새로고침은 게임 선택 화면을 유지해요.
+const arrival = performance.getEntriesByType('navigation')[0]?.type;
+const fromGame = document.referrer.startsWith(new URL('games/', location.href).href);
+if (location.hash === '#games' && arrival === 'navigate' && !fromGame) {
+  history.replaceState(null, '', location.pathname + location.search);
 }
 
 window.addEventListener('hashchange', route);
