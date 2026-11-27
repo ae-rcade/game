@@ -15,10 +15,55 @@
       <h1>지렁이 게임</h1>
     </header>
     <section class="screen" id="game">
-      <img class="game-icon" src="icon.svg" alt="">
-      <p class="soon">COMING SOON</p>
-      <p>게임을 준비하고 있어요</p>
+      <canvas id="board" aria-label="게임 화면. 끌어서 방향을 정하고, 빠르게 두 번 터치하면 부스트."></canvas>
+      <div class="hud" id="hud" hidden>
+        <p class="length">길이<strong id="length">0</strong></p>
+        <div class="ranking">
+          <h2>TOP 10</h2>
+          <ol id="ranking"></ol>
+        </div>
+        <div class="boost" id="boost">
+          <span>두 번 터치 · 부스트</span>
+          <i><b id="boost-fill"></b></i>
+        </div>
+        <canvas id="minimap" aria-label="미니맵"></canvas>
+      </div>
+      <p class="error" id="error" hidden>게임을 불러오지 못했어요.<br>새로고침해 주세요.</p>
     </section>
+
+    <div class="modal" id="menu" role="dialog" aria-labelledby="menu-title">
+      <div class="modal-box">
+        <h2 id="menu-title">지렁이 게임</h2>
+        <form id="join">
+          <input id="name" type="text" maxlength="10" placeholder="닉네임 (10자 이내)" aria-label="닉네임" autocomplete="off" enterkeyhint="go">
+          <button type="submit" class="action primary" id="enter" disabled>▶ 입장하기</button>
+        </form>
+        <p class="note" id="message" aria-live="polite"></p>
+        <ul class="how">
+          <li>화면을 <b>끌어서</b> 방향 조종</li>
+          <li><b>두 번 빠르게 터치</b>하면 부스트</li>
+          <li>캐릭터를 먹으면 그 색으로 길어져요</li>
+          <li>머리가 다른 지렁이나 맵 끝에 닿으면 끝!</li>
+        </ul>
+        <a class="action" href="../../index.html#games">게임 목록으로</a>
+      </div>
+    </div>
+
+    <div class="modal clear" id="result" role="dialog" aria-labelledby="result-title" hidden>
+      <div class="modal-box">
+        <h2 id="result-title">GAME OVER</h2>
+        <p class="note" id="cause"></p>
+        <p class="final">최종 길이<strong id="final">0</strong></p>
+        <dl>
+          <div><dt>순위</dt><dd id="final-rank"></dd></div>
+          <div><dt>잡은 수</dt><dd id="final-kills"></dd></div>
+          <div><dt>내 최고</dt><dd id="final-best"></dd></div>
+        </dl>
+        <button type="button" class="action primary" id="again">▶ 바로 다시 시작</button>
+        <button type="button" class="action" id="rename">닉네임 바꾸기</button>
+        <a class="action plain" href="../../index.html#games">게임 목록으로</a>
+      </div>
+    </div>
   </main>
   <script type="module" src="main.js"></script>
 </body>
