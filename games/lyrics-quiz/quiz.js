@@ -1,9 +1,10 @@
 // 화면과 무관한 퀴즈 규칙: 표(CSV) 읽기, 정답 판정, 점수
 export const DURATION_MS = 90_000;           // 타임어택 시간
 export const COUNTDOWN_MS = 3000;
-export const POINTS = [100, 70, 40, 10];     // 가사를 1, 2, 3, 4줄 열었을 때 점수
-// 각 줄을 열 수 있을 때까지, 앞 줄을 연 뒤 기다리는 시간. 1번째 줄은 처음부터 보여요.
-export const LINE_DELAYS_MS = [0, 0, 3000, 5000];
+export const POINTS = [100, 100, 60, 20];    // 가사를 1, 2, 3, 4줄 열었을 때 점수
+export const FREE_LINES = 2;                 // 문제가 나오자마자 보여주는 줄 수
+// 각 줄을 열 수 있을 때까지, 앞 줄이 열린 뒤 기다리는 시간
+export const LINE_DELAYS_MS = [0, 0, 5000, 5000];
 export const SHOWN_LINES = LINE_DELAYS_MS.length; // 한 문제에서 보여주는 가사 칸 수
 export const WRONG_PENALTY = 20;             // 오답 감점
 export const REVEAL_MS = 1200;               // 다음 문제 전에 정답을 보여주는 시간 (남은 시간은 멈춰요)

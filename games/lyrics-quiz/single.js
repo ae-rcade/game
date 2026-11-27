@@ -1,6 +1,6 @@
 // 싱글 모드: 90초 타임어택
 import {
-  DURATION_MS, COUNTDOWN_MS, LINE_DELAYS_MS, WRONG_PENALTY, REVEAL_MS, pointsFor, isCorrect, shuffle, pickLines, titleMasker,
+  DURATION_MS, COUNTDOWN_MS, LINE_DELAYS_MS, FREE_LINES, WRONG_PENALTY, REVEAL_MS, pointsFor, isCorrect, shuffle, pickLines, titleMasker,
 } from './quiz.js';
 
 const $ = (id) => document.getElementById(id);
@@ -23,7 +23,8 @@ export function createSingle({ onFinish }) {
     const box = $('lines').children[run.opened].firstChild;
     box.textContent = run.lines[run.opened];
     run.opened++;
-    run.unlockAt = performance.now() + (LINE_DELAYS_MS[run.opened] || 0);
+    // 카운트다운 중에 열린 줄은 게임이 시작될 때부터 대기 시간을 세요.
+    run.unlockAt = Math.max(performance.now(), run.startsAt) + (LINE_DELAYS_MS[run.opened] || 0);
     $('worth').textContent = `맞히면 ${pointsFor(run.opened)}점`;
     updateLocks();
     box.scrollIntoView({ block: 'nearest' });
@@ -63,7 +64,7 @@ export function createSingle({ onFinish }) {
       return item;
     }));
     $('answer').value = '';
-    openLine();
+    while (run.opened < Math.min(FREE_LINES, run.lines.length)) openLine();
     $('card').scrollTop = 0;
   }
 

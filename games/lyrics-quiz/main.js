@@ -61,9 +61,9 @@ function menu() {
 }
 
 $('rule-time').textContent = `${DURATION_MS / 1000}초 동안 최대한 많이 맞혀요`;
-$('rule-points').textContent = POINTS.map((p, i) => `${i + 1}줄 ${p}점`).join(' · ');
+$('rule-points').textContent = `2줄까지 ${POINTS[1]}점 · 3줄 ${POINTS[2]}점 · 4줄 ${POINTS[3]}점`;
 $('rule-wrong').textContent = `틀리면 -${WRONG_PENALTY}점이고 다음 문제로 넘어가요. 패스는 가사를 모두 연 뒤에 가능해요`;
-$('rule-wait').textContent = `3번째 줄은 2번째 줄을 연 뒤 ${LINE_DELAYS_MS[2] / 1000}초, 4번째 줄은 3번째 줄을 연 뒤 ${LINE_DELAYS_MS[3] / 1000}초 후에 열 수 있어요`;
+$('rule-wait').textContent = `처음 2줄은 바로 보여요. 3번째 줄은 문제가 나온 뒤 ${LINE_DELAYS_MS[2] / 1000}초, 4번째 줄은 3번째 줄을 연 뒤 ${LINE_DELAYS_MS[3] / 1000}초 후에 열 수 있어요`;
 $('single').addEventListener('click', prepare);
 $('reload').addEventListener('click', prepare);
 $('start').addEventListener('click', () => { show('play'); single.start(questions); });
