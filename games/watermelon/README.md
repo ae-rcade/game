@@ -1,11 +1,16 @@
 # 수박 게임
 
 같은 단계끼리 닿으면 다음 단계로 합쳐져요.
+모드는 **시간 무제한**과 **타임어택 120초** 두 가지이고, 모드마다 탑10을 따로 기록해요.
 점선 위에 약 1.5초 머무르면 게임 오버예요 (`engine.js`의 `LIMIT_MS`).
 탄력은 `engine.js`의 `BOUNCE`에서 조절해요.
 
 ## 파일
 
+- `modes.js` 모드 이름·제한 시간(120초)·카운트다운
+- `panel.js`, `ranking.js` 순위표·닉네임 등록
+- `config.json` 온라인 랭킹 서버 주소
+- `server/` 랭킹 서버 (설정 방법은 `server/README.md`)
 - `engine.js` 규칙과 물리
 - `shape.js`, `contour.js` 그림 윤곽으로 충돌 모양 만들기 (`TOLERANCE`로 세밀함 조절)
 - `main.js` 화면과 터치 입력

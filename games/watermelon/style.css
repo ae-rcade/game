@@ -1,7 +1,10 @@
 /* 수박 게임 전용 스타일. 이 파일의 변경은 다른 게임에 영향을 주지 않아요. */
 body { overscroll-behavior: none; user-select: none; -webkit-user-select: none; }
-.restart { margin-left: auto; font: 700 24px Galmuri, sans-serif; cursor: pointer; }
-.status { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 14px 0; }
+.app { position: relative; }
+.topbar h1 { flex: 1; min-width: 0; white-space: nowrap; }
+.tool { font: 700 24px Galmuri, sans-serif; cursor: pointer; }
+.rank { font-size: 13px; background: var(--lilac); }
+.status { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; padding: 10px 14px 0; }
 .status p { display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 56px; padding: 6px;
   font-size: 12px; color: var(--ink); background: var(--lilac); border: 3px solid var(--ink); border-radius: 12px; }
 .status strong { font-size: 20px; }
@@ -10,13 +13,53 @@ body { overscroll-behavior: none; user-select: none; -webkit-user-select: none; 
 #stage { position: absolute; inset: 6px; display: flex; align-items: flex-end; justify-content: center; }
 #field { border-bottom: 3px solid var(--lilac); border-inline: 1px dashed #ffffff55; }
 #board { display: block; width: 100%; height: 100%; touch-action: none; cursor: pointer; }
-.over { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
-  text-align: center; line-height: 1.8; background: #2B2156cc; border-radius: 18px; font-size: 18px; }
-.over button { padding: 12px 24px; font: 700 18px Galmuri, sans-serif; color: var(--ink); background: var(--cyan);
-  border: 3px solid var(--ink); border-radius: 12px; box-shadow: 0 5px 0 var(--ink); cursor: pointer; }
 .order { list-style: none; display: flex; align-items: center; justify-content: center; gap: 2px; margin: 0 14px 12px; padding: 8px 4px;
   background: var(--lilac); border: 3px solid var(--ink); border-radius: 14px; }
 .order li { flex: 0 1 34px; display: flex; justify-content: center; }
 .order img { width: 100%; aspect-ratio: 1; object-fit: contain; image-rendering: pixelated; }
 .order li:nth-child(-n+4) img { width: 76%; }
 .status img.round, .order img.round { border-radius: 50%; }
+
+#time.urgent { color: #D6336C; animation: blink 1s steps(2, jump-none) infinite; }
+.countdown { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none;
+  font-size: 64px; font-weight: 700; color: var(--cyan); text-shadow: 4px 4px 0 var(--ink); }
+@keyframes blink { 50% { opacity: .35; } }
+
+/* 모드 선택·순위·결과 화면 */
+.modal { position: absolute; inset: 0; z-index: 10; display: flex; overflow-y: auto; overscroll-behavior: contain; padding: 14px;
+  background: linear-gradient(180deg, #D9B8F3 0%, var(--purple) 55%, #A9B9F4 100%); }
+.modal-box { width: 100%; margin: auto; display: flex; flex-direction: column; gap: 10px; padding: 18px 14px;
+  background: linear-gradient(180deg, var(--ink), #7E67C4); border: 4px solid var(--lilac); border-radius: 22px; box-shadow: 0 0 0 3px var(--ink); }
+.modal-box.center { gap: 18px; padding-block: 28px; }
+.modal h2 { text-align: center; font-size: 24px; color: var(--cyan); }
+.modal button, .action { font-family: Galmuri, sans-serif; cursor: pointer; }
+.mode, .action, #form button { color: var(--ink); border: 3px solid var(--ink); border-radius: 12px; box-shadow: 0 4px 0 var(--ink); }
+.mode { display: flex; flex-direction: column; gap: 8px; padding: 16px 10px; background: var(--cyan); }
+.mode.alt { background: var(--lilac); }
+.mode strong { font-size: 22px; }
+.mode span { font-size: 12px; }
+.action { display: block; padding: 11px; font-size: 16px; font-weight: 700; text-align: center; background: var(--lilac); }
+.action.primary { background: var(--cyan); }
+.action.plain { background: var(--white); }
+.actions { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 10px; padding-bottom: 4px; }
+.note { text-align: center; font-size: 13px; line-height: 1.7; }
+.note:empty { display: none; }
+.note.small { font-size: 11px; color: var(--lilac); }
+.my-result { text-align: center; line-height: 1.6; font-size: 13px; }
+.my-result p { font-size: 18px; }
+.my-result strong { font-size: 32px; color: var(--cyan); }
+#form { display: flex; gap: 8px; }
+#name { flex: 1; min-width: 0; padding: 10px; font: 16px Galmuri, sans-serif; color: var(--ink); border: 3px solid var(--cyan); border-radius: 12px;
+  user-select: text; -webkit-user-select: text; }
+#form button { padding: 0 18px; font-size: 16px; font-weight: 700; background: var(--cyan); }
+#form button:disabled { opacity: .5; }
+.tabs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; }
+.tabs button { padding: 8px 4px; font-size: 13px; color: var(--lilac); background: transparent; border: 2px solid var(--lilac); border-radius: 10px; }
+.tabs button[aria-pressed="true"] { color: var(--ink); background: var(--lilac); }
+.modal table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px; color: var(--ink); background: var(--white); border-radius: 10px; overflow: hidden; }
+.modal th, .modal td { height: 26px; padding: 0 8px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.modal th { font-size: 12px; background: var(--cyan); }
+.modal th:first-child { width: 52px; }
+.modal th:last-child { width: 80px; }
+.modal tbody tr:nth-child(even) { background: #F4EBFC; }
+.modal tbody tr.mine { background: #FFE59A; font-weight: 700; }

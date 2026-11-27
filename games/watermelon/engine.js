@@ -1,5 +1,5 @@
 // 게임 규칙과 물리. 화면 그리기·입력은 main.js에서 담당해요.
-const { Engine, Bodies, Body, Composite, Events, Vertices } = window.Matter;
+const { Engine, Bodies, Body, Composite, Events, Sleeping, Vertices } = window.Matter;
 
 export const WIDTH = 360;
 export const HEIGHT = 520;
@@ -14,8 +14,10 @@ const BOUNCE = { restitution: 0.6, friction: 0.15, frictionStatic: 0.3, friction
 export const STEP_MS = 1000 / 60;
 
 // shapes[단계]는 반지름 1 기준의 볼록 다각형 목록이에요. 없으면 원으로 판정해요.
-export function createGame(levels, { shapes = [], random = Math.random, onMerge = () => {} } = {}) {
-  const engine = Engine.create({ positionIterations: 10, velocityIterations: 8 });
+// durationMs가 0보다 크면 그 시간이 지났을 때 끝나요(타임어택).
+export function createGame(levels, { shapes = [], durationMs = 0, random = Math.random, onMerge = () => {} } = {}) {
+  // enableSleeping: 멈춘 조각은 쉬게 해서 쌓인 상태의 떨림을 없애요.
+  const engine = Engine.create({ positionIterations: 10, velocityIterations: 8, enableSleeping: true });
   const wall = (x, y, w, h) => Bodies.rectangle(x, y, w, h, { isStatic: true, label: 'wall' });
   Composite.add(engine.world, [
     wall(WIDTH / 2, HEIGHT + 50, WIDTH + 200, 100),
@@ -26,13 +28,14 @@ export function createGame(levels, { shapes = [], random = Math.random, onMerge 
   const pieces = new Set();
   const pairs = [];
   const pick = () => Math.floor(random() * Math.min(DROP_LEVELS, levels.length));
-  const state = { score: 0, over: false, time: 0, readyAt: 0, current: pick(), next: pick(), danger: 0 };
+  // reason: 끝난 이유 ('line' 점선 초과, 'time' 시간 종료)
+  const state = { score: 0, over: false, reason: null, timeLeft: durationMs, time: 0, readyAt: 0, current: pick(), next: pick(), danger: 0 };
 
   function add(level, x, y) {
     const r = levels[level].radius;
     const px = Math.min(WIDTH - r, Math.max(r, x));
     const py = Math.min(HEIGHT - r, y);
-    const options = { ...BOUNCE, label: 'piece' };
+    const options = { ...BOUNCE, sleepThreshold: 45, label: 'piece' };
     let body;
     // offset: 물리 중심에서 본 그림 중심의 위치
     let offset = { x: 0, y: 0 };
@@ -81,6 +84,7 @@ export function createGame(levels, { shapes = [], random = Math.random, onMerge 
       const level = a.level;
       remove(a);
       remove(b);
+      for (const p of pieces) Sleeping.set(p, false); // 받치던 조각이 사라졌으니 모두 깨워요.
       const top = level === levels.length - 1;
       if (!top) Body.setVelocity(add(level + 1, x, y), velocity);
       // 마지막 단계 두 개가 만나면 둘 다 사라지고 보너스 점수
@@ -127,7 +131,15 @@ export function createGame(levels, { shapes = [], random = Math.random, onMerge 
         worst = Math.max(worst, p.overTime);
       }
       state.danger = Math.min(1, worst / LIMIT_MS);
-      if (state.danger >= 1) state.over = true;
+      if (durationMs) state.timeLeft = Math.max(0, durationMs - state.time);
+      if (state.danger >= 1) {
+        state.over = true;
+        state.reason = 'line';
+      } else if (durationMs && state.timeLeft < 0.001) {
+        state.timeLeft = 0;
+        state.over = true;
+        state.reason = 'time';
+      }
     },
   };
 }

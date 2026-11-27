@@ -1,19 +1,25 @@
-// 화면 그리기와 터치 입력. 게임 규칙은 engine.js에 있어요.
+// 진행 흐름, 화면 그리기, 터치 입력. 게임 규칙은 engine.js, 순위 화면은 panel.js에 있어요.
 import { createGame, WIDTH, HEIGHT, DANGER_Y, DROP_Y, STEP_MS } from './engine.js';
 import { analyze } from './shape.js';
+import { MODES, COUNTDOWN_MS } from './modes.js';
+import { createRanking } from './ranking.js';
+import { createPanel } from './panel.js';
 
 const $ = (id) => document.getElementById(id);
 const canvas = $('board');
 const ctx = canvas.getContext('2d');
-const BEST_KEY = 'ae-rcade.watermelon.best';
+const bestKey = (mode) => (mode === 'endless' ? 'ae-rcade.watermelon.best' : `ae-rcade.watermelon.best.${mode}`);
 
-let levels, sprites, shapes, thumbs, game, aimX = WIDTH / 2, aiming = false, effects = [], best = readBest();
+let levels, sprites, shapes, thumbs, game, ranking, panel;
+let aimX = WIDTH / 2, aiming = false, effects = [], best = 0;
+// phase: 'menu' 모드 선택, 'countdown' 시작 대기, 'playing' 진행, 'over' 종료
+let phase = 'menu', mode = 'endless', countdown = 0, session = null;
 
 function readBest() {
-  try { return Number(localStorage.getItem(BEST_KEY)) || 0; } catch { return 0; }
+  try { return Number(localStorage.getItem(bestKey(mode))) || 0; } catch { return 0; }
 }
 function saveBest() {
-  try { localStorage.setItem(BEST_KEY, String(best)); } catch { /* 저장이 막힌 브라우저 */ }
+  try { localStorage.setItem(bestKey(mode), String(best)); } catch { /* 저장이 막힌 브라우저 */ }
 }
 
 const loadImage = (src) => new Promise((resolve) => {
@@ -59,14 +65,14 @@ function draw() {
   ctx.strokeStyle = state.danger > 0 && Math.floor(state.time / 150) % 2 ? '#FF7A9C' : '#E9D3FA';
   ctx.beginPath(); ctx.moveTo(0, DANGER_Y); ctx.lineTo(WIDTH, DANGER_Y); ctx.stroke();
 
-  if (!state.over) {
+  if (!state.over && phase !== 'menu') {
     const r = levels[state.current].radius;
     const x = Math.min(WIDTH - r, Math.max(r, aimX));
     if (aiming) {
       ctx.strokeStyle = '#9CEAFE';
       ctx.beginPath(); ctx.moveTo(x, DROP_Y + r); ctx.lineTo(x, HEIGHT); ctx.stroke();
     }
-    ctx.globalAlpha = game.canDrop() ? 1 : 0.35;
+    ctx.globalAlpha = phase === 'playing' && game.canDrop() ? 1 : 0.35;
     drawPiece(state.current, x, DROP_Y);
     ctx.globalAlpha = 1;
   }
@@ -96,19 +102,56 @@ function hud() {
   const src = thumbs[state.next];
   if ($('next').getAttribute('src') !== src) $('next').src = src;
   $('next').classList.toggle('round', !shapes[state.next]);
-  if (state.over && $('over').hidden) {
-    $('final').textContent = state.score;
-    $('over').hidden = false;
-    $('retry').focus();
+  if (MODES[mode].durationMs) {
+    const seconds = Math.ceil(state.timeLeft / 1000);
+    $('time').textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+    $('time').classList.toggle('urgent', seconds <= 10);
   }
 }
 
-function start() {
+function showCountdown(text) {
+  $('countdown').hidden = !text;
+  if (text && $('countdown').textContent !== text) $('countdown').textContent = text;
+}
+
+function newGame() {
   effects = [];
-  game = createGame(levels, { shapes, onMerge: (e) => effects.push({ ...e, start: game.state.time }) });
-  $('over').hidden = true;
   aimX = WIDTH / 2;
   aiming = false;
+  game = createGame(levels, {
+    shapes,
+    durationMs: MODES[mode].durationMs,
+    onMerge: (e) => effects.push({ ...e, start: game.state.time }),
+  });
+  best = readBest();
+  $('time-box').hidden = !MODES[mode].durationMs;
+}
+
+function showMenu() {
+  phase = 'menu';
+  panel.close();
+  showCountdown('');
+  newGame();
+  $('menu').hidden = false;
+}
+
+function start(nextMode = mode) {
+  mode = nextMode;
+  panel.close();
+  $('menu').hidden = true;
+  newGame();
+  // 랭킹 등록에 쓰는 시작 확인값. 연결에 실패해도 게임은 할 수 있어요.
+  session = ranking.start(mode).catch((error) => { console.warn(error); return null; });
+  countdown = MODES[mode].durationMs ? COUNTDOWN_MS : 0;
+  phase = countdown ? 'countdown' : 'playing';
+  showCountdown(countdown ? String(COUNTDOWN_MS / 1000) : '');
+}
+
+function finish() {
+  phase = 'over';
+  aiming = false;
+  showCountdown('');
+  panel.showResult(mode, { score: game.state.score, reason: game.state.reason, session, rank: null });
 }
 
 function resize() {
@@ -129,12 +172,13 @@ function point(event) {
   aimX = ((event.clientX - rect.left) / rect.width) * WIDTH;
 }
 // 누른 채 좌우로 움직이고, 손을 떼면 떨어져요.
-canvas.addEventListener('pointerdown', (e) => { aiming = true; canvas.setPointerCapture(e.pointerId); point(e); });
+canvas.addEventListener('pointerdown', (e) => {
+  if (phase !== 'playing') return;
+  aiming = true; canvas.setPointerCapture(e.pointerId); point(e);
+});
 canvas.addEventListener('pointermove', point);
 canvas.addEventListener('pointerup', (e) => { if (!aiming) return; point(e); aiming = false; game.drop(aimX); });
 canvas.addEventListener('pointercancel', () => { aiming = false; });
-$('retry').addEventListener('click', start);
-$('restart').addEventListener('click', start);
 
 async function init() {
   try {
@@ -142,6 +186,7 @@ async function init() {
     const res = await fetch('characters.json', { cache: 'no-cache' });
     if (!res.ok) throw new Error(`characters.json: ${res.status}`);
     levels = await res.json();
+    ranking = await createRanking();
     const images = await Promise.all(levels.map((l) => loadImage(l.image)));
     const parts = images.map((img, i) => analyze(img || numberBall(i + 1)));
     sprites = parts.map((p) => p.sprite);
@@ -161,16 +206,40 @@ async function init() {
     item.append(img);
     $('order').append(item);
   }
-  start();
+  panel = createPanel(ranking);
+  for (const [id, { label }] of Object.entries(MODES)) {
+    $(`start-${id}`).querySelector('strong').textContent = label;
+    $(`start-${id}`).addEventListener('click', () => start(id));
+  }
+  $('restart').addEventListener('click', () => start());
+  $('retry').addEventListener('click', () => start());
+  $('to-menu').addEventListener('click', showMenu);
+  $('menu-ranking').addEventListener('click', () => panel.showRanking(mode, '닫기'));
+  // 순위를 보는 동안에는 게임과 남은 시간이 멈춰요.
+  $('rank').addEventListener('click', () => { aiming = false; panel.showRanking(mode); });
+  $('resume').addEventListener('click', () => panel.close());
+  $('scope-menu').hidden = ranking.shared;
+  showMenu();
   new ResizeObserver(resize).observe($('stage'));
 
   let last = performance.now();
   let acc = 0;
   const frame = (now) => {
     // 다른 탭에 다녀와도 한꺼번에 진행되지 않도록 제한
-    acc += Math.min(100, now - last);
+    const passed = Math.min(100, now - last);
     last = now;
-    while (acc >= STEP_MS) { game.step(); acc -= STEP_MS; }
+    if (panel.isOpen || phase === 'menu' || phase === 'over') {
+      acc = 0;
+    } else if (phase === 'countdown') {
+      countdown -= passed;
+      if (countdown > 0) showCountdown(String(Math.ceil(countdown / 1000)));
+      else { phase = 'playing'; showCountdown('START!'); }
+    } else {
+      acc += passed;
+      while (acc >= STEP_MS && !game.state.over) { game.step(); acc -= STEP_MS; }
+      if (game.state.time > 600) showCountdown('');
+      if (game.state.over) finish();
+    }
     draw();
     hud();
     requestAnimationFrame(frame);
