@@ -3,7 +3,7 @@ import { RULES } from './rules.js';
 
 export const TICK_MS = 66;        // 서버가 상태를 보내는 간격(초당 약 15번)
 export const DELAY_MS = 140;      // 화면은 이만큼 늦게 보여 주며 사이를 부드럽게 이어요.
-export const INPUT_MS = 120;      // 방향은 이 간격보다 자주 보내지 않아요(무료 한도 절약).
+export const INPUT_MS = 110;      // 방향은 이 간격보다 자주 보내지 않아요(무료 한도 절약).
 export const PING_MS = 10_000;    // 접속 중임을 알리는 간격
 const SAMPLE = 3;                 // 처음 보이는 지렁이의 몸은 이 마디마다 한 점만 보내요.
 
