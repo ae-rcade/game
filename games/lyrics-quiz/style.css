@@ -1,2 +1,63 @@
 /* 가사 맞추기 전용 스타일. 이 파일의 변경은 다른 게임에 영향을 주지 않아요. */
-.game-icon { width: 112px; image-rendering: pixelated; }
+.app { height: var(--visible-height, 100dvh); }
+.game-icon { width: 96px; image-rendering: pixelated; }
+h2 { font-size: 24px; color: var(--cyan); text-align: center; }
+
+#menu, #ready, #result { justify-content: safe center; overflow-y: auto; padding: 18px 14px; }
+.screen > * { flex: none; }
+
+.action, .mode {
+  font-family: Galmuri, system-ui, sans-serif; color: var(--ink); cursor: pointer; text-align: center;
+  border: 3px solid var(--ink); border-radius: 12px; box-shadow: 0 4px 0 var(--ink); background: var(--lilac);
+}
+.action { width: 100%; padding: 11px 14px; font-size: 16px; font-weight: 700; }
+.action.primary, .mode { background: var(--cyan); }
+.action.plain { background: var(--white); }
+.action:disabled, .mode:disabled { opacity: .55; cursor: default; }
+.mode { width: 100%; display: flex; flex-direction: column; gap: 8px; padding: 16px 10px; }
+.mode.alt { background: var(--lilac); }
+.mode strong { font-size: 22px; }
+.mode span { font-size: 12px; }
+
+.note { text-align: center; font-size: 13px; line-height: 1.7; }
+.rules { list-style: none; width: 100%; display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 1.6; }
+.rules li { padding: 10px 12px; border: 2px solid var(--lilac); border-radius: 10px; }
+.rules small { display: block; font-size: 11px; color: var(--cyan); }
+
+.play { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.status { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 8px 14px 0; }
+.status p { padding: 6px 4px; text-align: center; font-size: 11px; color: var(--ink); background: var(--lilac); border: 3px solid var(--ink); border-radius: 12px; }
+.status strong { display: block; font-size: 20px; }
+#time.urgent { color: #D6336C; }
+.card-screen { margin-bottom: 4px; justify-content: stretch; overflow: hidden; }
+.card { flex: 1 1 0; min-height: 0; width: 100%; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 14px; }
+.card > * { flex: none; }
+.card.waiting { visibility: hidden; }
+.number { display: flex; justify-content: space-between; font-size: 13px; color: var(--cyan); }
+#lines { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+#lines li { padding: 12px 10px; text-align: center; font-size: 18px; line-height: 1.6; color: var(--ink); background: var(--white); border-radius: 12px; overflow-wrap: anywhere; }
+#more { font-size: 13px; }
+.countdown { position: absolute; inset: 0; display: grid; place-items: center; font-size: 64px; font-weight: 700; color: var(--cyan); text-shadow: 4px 4px 0 var(--ink); }
+.feedback { min-height: 22px; padding: 0 14px; text-align: center; font-size: 13px; line-height: 22px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 1px 1px 0 var(--ink); }
+.feedback.good { color: #FFF3B0; font-weight: 700; }
+.feedback.bad { color: #7A1038; text-shadow: none; font-weight: 700; }
+.answer { display: flex; gap: 8px; padding: 6px 14px 16px; }
+.answer .action { width: auto; flex: none; padding-inline: 12px; }
+.answer input { flex: 1; min-width: 0; padding: 10px; font: 16px Galmuri, system-ui, sans-serif; color: var(--ink); border: 3px solid var(--ink); border-radius: 12px; }
+
+.my-score { font-size: 18px; }
+.my-score strong { font-size: 40px; color: var(--cyan); }
+.history { list-style: none; width: 100%; display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 1.5; }
+.history li { padding: 7px 10px; color: var(--ink); background: var(--lilac); border-radius: 8px; overflow-wrap: anywhere; }
+.history li.solved { background: #FFE59A; font-weight: 700; }
+
+/* 키보드가 열려 화면이 낮아졌을 때 */
+.app.compact .topbar { display: none; }
+.app.compact .status p { padding-block: 2px; }
+.app.compact .status strong { font-size: 16px; }
+.app.compact .screen { margin-top: 6px; }
+.app.compact .answer { padding-bottom: 8px; }
+.app.compact #lines li { padding-block: 7px; font-size: 16px; }
+/* 키보드 때문에 화면이 가로 비율이 되어도 '세로로 돌려주세요' 안내가 뜨지 않게 해요. */
+body:has(#answer:focus) .app { visibility: visible; }
+body:has(#answer:focus)::after { display: none; }

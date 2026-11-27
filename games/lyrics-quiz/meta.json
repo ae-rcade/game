@@ -1,9 +1,6 @@
 {
   "title": "가사 맞추기",
   "description": "가사를 보고 노래 제목을 맞혀요",
-  "modes": [
-    "개인",
-    "최대 4인"
-  ],
-  "ready": false
+  "modes": ["개인"],
+  "ready": true
 }

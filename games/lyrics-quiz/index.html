@@ -11,13 +11,61 @@
 <body>
   <main class="app">
     <header class="topbar">
-      <a class="btn-back" href="../../index.html#games" aria-label="게임 목록으로">◀</a>
+      <a class="btn-back" id="back" href="../../index.html#games" aria-label="뒤로">◀</a>
       <h1>가사 맞추기</h1>
     </header>
-    <section class="screen" id="game">
+
+    <section class="screen" id="menu">
       <img class="game-icon" src="icon.svg" alt="">
-      <p class="soon">COMING SOON</p>
-      <p>게임을 준비하고 있어요</p>
+      <h2>모드 선택</h2>
+      <button type="button" class="mode" id="single"><strong>싱글 모드</strong><span>혼자서 타임어택</span></button>
+      <button type="button" class="mode alt" disabled><strong>멀티 모드</strong><span>최대 4인 · 준비 중</span></button>
+      <a class="action plain" href="../../index.html#games">게임 목록으로</a>
+    </section>
+
+    <section class="screen" id="ready" hidden>
+      <h2>싱글 모드</h2>
+      <ul class="rules">
+        <li id="rule-time"></li>
+        <li>가사를 보고 노래 제목을 직접 입력해요</li>
+        <li>가사는 한 줄씩 열 수 있고, 적게 볼수록 점수가 높아요<small id="rule-points"></small></li>
+        <li>틀려도 다시 입력할 수 있고, 모르면 패스해요</li>
+      </ul>
+      <p class="note" id="load-message" aria-live="polite"></p>
+      <button type="button" class="action" id="reload" hidden>다시 불러오기</button>
+      <button type="button" class="action primary" id="start" disabled>▶ 시작</button>
+      <button type="button" class="action" data-menu>모드 선택</button>
+    </section>
+
+    <div class="play" id="play" hidden>
+      <div class="status">
+        <p>점수<strong id="score">0</strong></p>
+        <p>남은 시간<strong id="time" role="timer">1:30</strong></p>
+        <p>맞힌 문제<strong id="correct">0</strong></p>
+      </div>
+      <section class="screen card-screen">
+        <div class="card" id="card">
+          <p class="number"><span id="number"></span><span id="worth"></span></p>
+          <ol id="lines" aria-live="polite"></ol>
+          <button type="button" class="action" id="more"></button>
+        </div>
+        <p class="countdown" id="countdown" aria-live="assertive" hidden></p>
+      </section>
+      <p class="feedback" id="feedback" aria-live="polite"></p>
+      <form class="answer" id="form">
+        <button type="button" class="action plain" id="pass">패스</button>
+        <input id="answer" type="text" placeholder="노래 제목" aria-label="노래 제목" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="send">
+        <button type="submit" class="action primary" id="submit">확인</button>
+      </form>
+    </div>
+
+    <section class="screen" id="result" hidden>
+      <h2 id="result-title"></h2>
+      <p class="my-score">내 점수 <strong id="final">0</strong></p>
+      <p class="note" id="summary"></p>
+      <ul class="history" id="history" aria-label="나온 문제와 정답"></ul>
+      <button type="button" class="action primary" id="retry">▶ 다시 하기</button>
+      <button type="button" class="action" data-menu>모드 선택</button>
     </section>
   </main>
   <script type="module" src="main.js"></script>
