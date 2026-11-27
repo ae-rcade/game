@@ -15,7 +15,8 @@ h2 { font-size: 24px; color: var(--cyan); text-align: center; }
 .action.plain { background: var(--white); }
 .action.level.easy { background: #FFF3B0; }
 .action:disabled, .mode:disabled { opacity: .55; cursor: default; }
-.mode { width: 100%; display: flex; flex-direction: column; gap: 8px; padding: 16px 10px; }
+/* 아이폰은 버튼 안의 글씨가 왼쪽으로 치우칠 수 있어서 align-items로도 가운데에 맞춰요. */
+.mode { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 10px; }
 .mode.alt { background: var(--lilac); }
 .mode strong { font-size: 22px; }
 .mode span { font-size: 12px; }

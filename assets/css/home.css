@@ -42,6 +42,8 @@
 li:nth-child(4n+1) .card, li:nth-child(4n+4) .card { background: var(--cyan); }
 .card:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink); }
 .card img { width: 68px; height: 68px; image-rendering: pixelated; }
+/* 큰 사진(PNG)은 부드럽게 줄여요. */
+.card img[src$=".png"] { image-rendering: auto; object-fit: contain; }
 .card strong { font-size: 18px; }
 .card p { font-size: 12px; line-height: 1.5; }
 .tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: auto; }

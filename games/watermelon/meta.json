@@ -1,5 +1,6 @@
 {
   "title": "수박 게임",
+  "icon": "images/ball9.png",
   "description": "같은 캐릭터를 합쳐 가장 큰 캐릭터를 만들어요",
   "modes": [
     "개인"

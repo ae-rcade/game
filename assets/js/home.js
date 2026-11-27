@@ -24,7 +24,8 @@ async function loadCard(id) {
   const link = el('a', '', 'card');
   link.href = `games/${id}/index.html`;
   const icon = el('img');
-  icon.src = `games/${id}/icon.svg`;
+  // meta.json에 icon이 있으면 그 그림을, 없으면 icon.svg를 써요(게임 폴더 기준 경로).
+  icon.src = `games/${id}/${meta.icon || 'icon.svg'}`;
   icon.alt = '';
   const tags = el('div', '', 'tags');
   for (const mode of Array.isArray(meta.modes) ? meta.modes : []) tags.append(el('span', mode));

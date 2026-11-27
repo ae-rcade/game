@@ -11,7 +11,7 @@ shared/theme.css    모든 화면이 함께 쓰는 색상과 기본 틀
 games/list.json     게임 표시 순서
 games/<게임>/       게임 하나 = 폴더 하나
   meta.json         카드에 보이는 이름·설명·모드·준비 상태
-  icon.svg          카드 아이콘
+  icon.svg          카드 아이콘 (meta.json의 icon으로 다른 그림 지정 가능)
   index.html        게임 화면
   style.css         게임 전용 스타일
   main.js           게임 코드
