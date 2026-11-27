@@ -12,7 +12,7 @@ Cloudflare Workers + Durable Object. 맵 하나 = `Arena` 객체 하나이고, �
    - Root directory(고급 설정): `games/worm/server`
 3. **Deploy**를 누르고, 끝나면 `workers.dev` 주소를 열어 "블랙맘바 서버가 동작 중이에요"가 보이는지 확인해요.
 4. 그 Worker의 **Settings → Build → Build watch paths → Include paths**에 넣어요.
-   `games/worm/server/*`, `games/worm/rules.js`, `games/worm/world.js`, `games/worm/bots.js`, `games/worm/protocol.js`
+   `games/worm/*` (서버가 함께 쓰는 파일이 바깥 폴더에 있어서 지렁이 폴더 전체를 넣어요)
 5. 서버 주소를 `../config.json`의 `serverUrl`에 넣어요.
 
 ## 인원과 무료 플랜 한도
