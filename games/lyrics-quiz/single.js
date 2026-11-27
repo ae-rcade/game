@@ -1,6 +1,6 @@
 // 싱글 모드: 90초 타임어택
 import {
-  DURATION_MS, COUNTDOWN_MS, LINE_DELAYS_MS, WRONG_PENALTY, REVEAL_MS, pointsFor, isCorrect, shuffle, pickLines,
+  DURATION_MS, COUNTDOWN_MS, LINE_DELAYS_MS, WRONG_PENALTY, REVEAL_MS, pointsFor, isCorrect, shuffle, pickLines, titleMasker,
 } from './quiz.js';
 
 const $ = (id) => document.getElementById(id);
@@ -50,7 +50,7 @@ export function createSingle({ onFinish }) {
 
   function showQuestion() {
     run.opened = 0;
-    run.lines = pickLines(question().lines);
+    run.lines = pickLines(question().lines).map(titleMasker(question()));
     $('number').textContent = `문제 ${run.index + 1}`;
     $('lines').replaceChildren(...run.lines.map((_, i) => {
       const item = document.createElement('li');

@@ -73,6 +73,37 @@ export function isCorrect(question, input) {
   return [question.title, bare, ...question.aliases].some((a) => a && normalize(a) === typed);
 }
 
+// 가사에 들어 있는 정답(제목·다른 표기)을 ●●●로 가려요.
+// 대소문자·띄어쓰기·문장부호가 달라도 찾고, 영어는 다른 단어의 일부(예: you → your)는 가리지 않아요.
+export const MASK = '●●●';
+
+export function titleMasker(question) {
+  const { title, aliases } = question;
+  const bare = title.replace(/\([^()]*\)|\[[^[\]]*\]/g, '');
+  // "WDA (Whole Different Animal)"처럼 괄호 안이 제목의 다른 이름인 경우. 솔로·버전·피처링 표시는 제외
+  const inside = [...title.matchAll(/\(([^()]*)\)/g)].map((m) => m[1])
+    .filter((t) => !/solo|ver\b|feat|&/i.test(t));
+  // 'Til We …는 Until We …로 부르는 부분도 가려요.
+  const until = /^['’]til\b/i.test(title) ? [bare.replace(/^['’]til/i, 'until')] : [];
+  const terms = [...new Set([title, bare, ...inside, ...until, ...aliases]
+    .map((t) => t.normalize('NFC').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '')))]
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length); // 긴 표기부터 가려요.
+  const patterns = terms.map((term) => {
+    const letters = [...term];
+    // 끝의 s와 -ing는 붙어 있어도 같은 말로 봐요 (drama/dramas, flowers/flower, drift/drifting).
+    const latin = /\p{Script=Latin}|\p{N}/u.test(term);
+    if (latin && letters.length >= 5 && letters.at(-1) === 's') letters.pop();
+    const body = letters.join('[^\\p{L}\\p{N}]*') + (latin && term.length >= 4 ? "(?:['’]?s|ing|in['’]?)?" : '');
+    // 영어·숫자와 한 글자짜리 표기는 앞뒤가 이어진 단어면 가리지 않아요.
+    const edge = latin ? '[\\p{Script=Latin}\\p{N}]' : letters.length < 2 ? '\\p{L}' : null;
+    return new RegExp(edge ? `(?<!${edge})${body}(?!${edge})` : body, 'giu');
+  });
+  // 줄바꿈에 걸친 제목은 줄바꿈을 남기고 가려요.
+  const hide = (found) => found.split('\n').map(() => MASK).join('\n');
+  return (line) => patterns.reduce((text, pattern) => text.replace(pattern, hide), line.normalize('NFC'));
+}
+
 export function shuffle(list, random = Math.random) {
   const result = [...list];
   for (let i = result.length - 1; i > 0; i--) {
