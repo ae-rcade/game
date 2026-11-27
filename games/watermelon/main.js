@@ -145,7 +145,7 @@ async function init() {
     const images = await Promise.all(levels.map((l) => loadImage(l.image)));
     const parts = images.map((img, i) => analyze(img || numberBall(i + 1)));
     sprites = parts.map((p) => p.sprite);
-    shapes = parts.map((p) => p.hull);
+    shapes = parts.map((p) => p.parts);
     thumbs = sprites.map((c) => c.toDataURL());
   } catch (error) {
     console.error(error);

@@ -10,10 +10,10 @@ const GRACE_MS = 1500;          // 막 떨어뜨린 캐릭터는 위험 판정�
 const LIMIT_MS = 1500;          // 위험선 위에 머물 수 있는 시간
 const COOLDOWN_MS = 500;
 // 탄력 조절: restitution이 클수록(0~1) 더 통통 튀어요.
-const BOUNCE = { restitution: 0.65, friction: 0.15, frictionStatic: 0.3, frictionAir: 0.008 };
+const BOUNCE = { restitution: 0.6, friction: 0.15, frictionStatic: 0.3, frictionAir: 0.008 };
 export const STEP_MS = 1000 / 60;
 
-// shapes[단계]는 반지름 1 기준의 윤곽 좌표예요. 없으면 원으로 판정해요.
+// shapes[단계]는 반지름 1 기준의 볼록 다각형 목록이에요. 없으면 원으로 판정해요.
 export function createGame(levels, { shapes = [], random = Math.random, onMerge = () => {} } = {}) {
   const engine = Engine.create({ positionIterations: 10, velocityIterations: 8 });
   const wall = (x, y, w, h) => Bodies.rectangle(x, y, w, h, { isStatic: true, label: 'wall' });
@@ -37,10 +37,15 @@ export function createGame(levels, { shapes = [], random = Math.random, onMerge 
     // offset: 물리 중심에서 본 그림 중심의 위치
     let offset = { x: 0, y: 0 };
     if (shapes[level]) {
-      const points = shapes[level].map((p) => ({ x: p.x * r, y: p.y * r }));
-      const centre = Vertices.centre(points);
+      // 오목한 모양은 볼록 조각 여러 개를 하나의 몸체로 묶어요.
+      const parts = shapes[level].map((polygon) => {
+        const vertices = Vertices.clockwiseSort(polygon.map((p) => ({ x: p.x * r, y: p.y * r })));
+        return Body.create({ ...options, position: Vertices.centre(vertices), vertices });
+      });
+      body = parts.length === 1 ? parts[0] : Body.create({ ...options, parts });
+      const centre = { x: body.position.x, y: body.position.y }; // 그림 중심 기준 무게중심
       offset = { x: -centre.x, y: -centre.y };
-      body = Bodies.fromVertices(px + centre.x, py + centre.y, [points], options);
+      Body.setPosition(body, { x: px + centre.x, y: py + centre.y });
     } else {
       body = Bodies.circle(px, py, r, options, 48);
     }
@@ -57,10 +62,11 @@ export function createGame(levels, { shapes = [], random = Math.random, onMerge 
   }
 
   const collect = (event) => {
-    for (const { bodyA, bodyB } of event.pairs) {
-      if (bodyA.label === 'piece' && bodyB.label === 'piece' && bodyA.level === bodyB.level) {
-        pairs.push([bodyA, bodyB]);
-      }
+    for (const pair of event.pairs) {
+      // 조각끼리 닿으면 그 조각이 속한 몸체(parent)를 비교해요.
+      const a = pair.bodyA.parent;
+      const b = pair.bodyB.parent;
+      if (a !== b && a.label === 'piece' && b.label === 'piece' && a.level === b.level) pairs.push([a, b]);
     }
   };
   Events.on(engine, 'collisionStart', collect);
