@@ -4,15 +4,16 @@ import {
 } from './quiz.js';
 
 const $ = (id) => document.getElementById(id);
-const BEST_KEY = 'ae-rcade.lyrics-quiz.best';
+// 최고 점수는 난이도별로 따로 저장해요.
+const BEST_KEYS = { normal: 'ae-rcade.lyrics-quiz.best', easy: 'ae-rcade.lyrics-quiz.best.easy' };
 
-function readBest() {
-  try { return Number(localStorage.getItem(BEST_KEY)) || 0; } catch { return 0; }
+function readBest(level) {
+  try { return Number(localStorage.getItem(BEST_KEYS[level])) || 0; } catch { return 0; }
 }
 const name = (q) => (q.artist ? `${q.title} - ${q.artist}` : q.title);
 
 export function createSingle({ onFinish }) {
-  let run = null; // { questions, index, lines, opened, unlockAt, reveal, score, correct, history, startsAt, endsAt, timer }
+  let run = null; // { level, questions, index, lines, opened, unlockAt, reveal, score, correct, history, startsAt, endsAt, timer }
 
   const question = () => run.questions[run.index];
   // 카운트다운 중이거나 정답을 보여주는 동안에는 입력을 받지 않아요.
@@ -51,7 +52,9 @@ export function createSingle({ onFinish }) {
 
   function showQuestion() {
     run.opened = 0;
-    run.lines = pickLines(question().lines).map(titleMasker(question()));
+    const lines = pickLines(question().lines);
+    // easy는 가사 속 제목을 가리지 않아요.
+    run.lines = run.level === 'easy' ? lines : lines.map(titleMasker(question()));
     $('number').textContent = `문제 ${run.index + 1}`;
     $('lines').replaceChildren(...run.lines.map((_, i) => {
       const item = document.createElement('li');
@@ -100,13 +103,13 @@ export function createSingle({ onFinish }) {
     clearInterval(run.timer);
     // 시간이 끝났을 때 풀던 문제도 정답 목록에 보여줘요.
     if (reason === 'time') run.history.push({ title: name(question()), kind: 'timeout' });
-    const { score, correct, history } = run;
-    const best = Math.max(readBest(), score);
-    try { localStorage.setItem(BEST_KEY, String(best)); } catch { /* 저장이 막힌 브라우저 */ }
+    const { level, score, correct, history } = run;
+    const best = Math.max(readBest(level), score);
+    try { localStorage.setItem(BEST_KEYS[level], String(best)); } catch { /* 저장이 막힌 브라우저 */ }
     run = null;
     $('reveal').hidden = true;
     $('answer').blur();
-    onFinish({ reason, score, correct, history, best });
+    onFinish({ reason, level, score, correct, history, best });
   }
 
   function tick() {
@@ -153,10 +156,10 @@ export function createSingle({ onFinish }) {
   for (const id of ['card', 'reveal', 'pass', 'submit']) $(id).addEventListener('mousedown', (e) => e.preventDefault());
 
   return {
-    start(questions) {
+    start(questions, level) {
       this.stop();
       const startsAt = performance.now() + COUNTDOWN_MS;
-      run = { questions: shuffle(questions), index: 0, opened: 0, score: 0, correct: 0, history: [], startsAt, endsAt: startsAt + DURATION_MS };
+      run = { level, questions: shuffle(questions), index: 0, opened: 0, score: 0, correct: 0, history: [], startsAt, endsAt: startsAt + DURATION_MS };
       $('reveal').hidden = true;
       status();
       showQuestion();

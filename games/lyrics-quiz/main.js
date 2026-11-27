@@ -7,16 +7,32 @@ const $ = (id) => document.getElementById(id);
 const VIEWS = ['menu', 'ready', 'play', 'result'];
 let view = 'menu', questions = null, request = 0;
 
+// 난이도: 시작 버튼 아래 버튼을 누를 때마다 바뀌고, 마지막 선택을 기억해요.
+const LEVELS = {
+  normal: { name: 'NORMAL', hint: '제목 가림', rule: '가사 속 제목은 ●●●로 가려요' },
+  easy: { name: 'EASY', hint: '제목 안 가림', rule: '가사 속 제목은 가리지 않아요' },
+};
+const LEVEL_KEY = 'ae-rcade.lyrics-quiz.level';
+let level = 'normal';
+try { if (localStorage.getItem(LEVEL_KEY) === 'easy') level = 'easy'; } catch { /* 저장이 막힌 브라우저 */ }
+
+function showLevel() {
+  const { name, hint, rule } = LEVELS[level];
+  $('level').textContent = `모드: ${name} (${hint}) ⇄`;
+  $('level').classList.toggle('easy', level === 'easy');
+  $('rule-lyrics').textContent = `노래 속 이어지는 가사 4줄을 보고 제목을 직접 입력해요. ${rule}`;
+}
+
 function show(next) {
   view = next;
   for (const id of VIEWS) $(id).hidden = id !== next;
 }
 
 const single = createSingle({
-  onFinish({ reason, score, correct, history, best }) {
+  onFinish({ reason, level, score, correct, history, best }) {
     $('result-title').textContent = reason === 'time' ? '시간 종료!' : '모든 문제 완료!';
     $('final').textContent = score;
-    $('summary').textContent = `맞힌 문제 ${correct}개 · 내 최고 점수 ${best}점`;
+    $('summary').textContent = `${LEVELS[level].name} · 맞힌 문제 ${correct}개 · 내 최고 점수 ${best}점`;
     const marks = { good: '○', bad: '×', skip: '패스', timeout: '시간 종료' };
     $('history').replaceChildren(...history.map(({ title, kind }) => {
       const item = document.createElement('li');
@@ -66,7 +82,13 @@ $('rule-wrong').textContent = `틀리면 -${WRONG_PENALTY}점이고 다음 문�
 $('rule-wait').textContent = `처음 2줄은 바로 보여요. 3번째 줄은 문제가 나온 뒤 ${LINE_DELAYS_MS[2] / 1000}초, 4번째 줄은 3번째 줄을 연 뒤 ${LINE_DELAYS_MS[3] / 1000}초 후에 열 수 있어요`;
 $('single').addEventListener('click', prepare);
 $('reload').addEventListener('click', prepare);
-$('start').addEventListener('click', () => { show('play'); single.start(questions); });
+$('start').addEventListener('click', () => { show('play'); single.start(questions, level); });
+$('level').addEventListener('click', () => {
+  level = level === 'easy' ? 'normal' : 'easy';
+  try { localStorage.setItem(LEVEL_KEY, level); } catch { /* 저장이 막힌 브라우저 */ }
+  showLevel();
+});
+showLevel();
 $('retry').addEventListener('click', prepare);
 for (const button of document.querySelectorAll('[data-menu]')) button.addEventListener('click', menu);
 // 위쪽 ◀ 버튼: 모드 선택에서는 게임 목록으로, 그 밖에는 모드 선택으로

@@ -27,7 +27,7 @@
       <h2>싱글 모드</h2>
       <ul class="rules">
         <li id="rule-time"></li>
-        <li>노래 속 이어지는 가사 4줄을 보고 제목을 직접 입력해요. 가사 속 제목은 ●●●로 가려요</li>
+        <li id="rule-lyrics"></li>
         <li>? 칸을 눌러 가사를 열어요. 적게 볼수록 점수가 높아요<small id="rule-points"></small></li>
         <li id="rule-wait"></li>
         <li id="rule-wrong"></li>
@@ -35,7 +35,7 @@
       <p class="note" id="load-message" aria-live="polite"></p>
       <button type="button" class="action" id="reload" hidden>다시 불러오기</button>
       <button type="button" class="action primary" id="start" disabled>▶ 시작</button>
-      <button type="button" class="action" data-menu>모드 선택</button>
+      <button type="button" class="action level" id="level"></button>
     </section>
 
     <div class="play" id="play" hidden>

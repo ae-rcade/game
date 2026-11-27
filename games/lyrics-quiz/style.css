@@ -13,6 +13,7 @@ h2 { font-size: 24px; color: var(--cyan); text-align: center; }
 .action { width: 100%; padding: 11px 14px; font-size: 16px; font-weight: 700; }
 .action.primary, .mode { background: var(--cyan); }
 .action.plain { background: var(--white); }
+.action.level.easy { background: #FFF3B0; }
 .action:disabled, .mode:disabled { opacity: .55; cursor: default; }
 .mode { width: 100%; display: flex; flex-direction: column; gap: 8px; padding: 16px 10px; }
 .mode.alt { background: var(--lilac); }
@@ -23,6 +24,10 @@ h2 { font-size: 24px; color: var(--cyan); text-align: center; }
 .rules { list-style: none; width: 100%; display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 1.6; }
 .rules li { padding: 10px 12px; border: 2px solid var(--lilac); border-radius: 10px; }
 .rules small { display: block; font-size: 11px; color: var(--cyan); }
+/* 작은 화면에서도 시작·모드 버튼이 잘리지 않게 안내 화면은 촘촘하게 */
+#ready { gap: 10px; padding-block: 10px 14px; }
+#ready .rules { gap: 7px; }
+#ready .rules li { padding-block: 7px; }
 
 .play { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .status { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 8px 14px 0; }
