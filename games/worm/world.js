@@ -16,7 +16,8 @@ export function segment(worm, i, out = { x: 0, y: 0 }) {
   return out;
 }
 
-export function createWorld({ random = Math.random } = {}) {
+// onFoodAdd·onFoodRemove: 서버가 바뀐 먹이만 보내려고 써요.
+export function createWorld({ random = Math.random, onFoodAdd, onFoodRemove } = {}) {
   const worms = new Map();
   const foods = new Map();
   const foodGrid = new Map();
@@ -37,6 +38,7 @@ export function createWorld({ random = Math.random } = {}) {
     cell.add(food);
     food.cell = cell;
     if (!big) natural++;
+    onFoodAdd?.(food);
     return food;
   }
 
@@ -44,6 +46,7 @@ export function createWorld({ random = Math.random } = {}) {
     if (!foods.delete(food.id)) return;
     food.cell.delete(food);
     if (!food.big) natural--;
+    onFoodRemove?.(food);
   }
 
   function eachFoodNear(x, y, range, visit) {
@@ -265,6 +268,7 @@ export function createWorld({ random = Math.random } = {}) {
 
   return {
     worms, foods, addWorm, addFood, removeFood, steer, boost, step, eachFoodNear,
+    remove: kill, // 접속이 끊긴 지렁이도 먹이로 바뀌어요.
     blocked: (x, y, pad, self) => bodyAt(x, y, pad, self) !== null,
   };
 }
