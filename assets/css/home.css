@@ -1,0 +1,73 @@
+.cabinet { position: relative; }
+
+.marquee { display: flex; align-items: center; gap: 8px; margin: 10px 14px 0; padding: 6px 10px;
+  background: var(--purple); border: 3px solid var(--lilac); border-radius: 8px 8px 18px 18px; box-shadow: 0 0 0 3px var(--ink); }
+.marquee-name { font-weight: 700; font-size: 18px; white-space: nowrap; text-shadow: 2px 2px 0 var(--ink); }
+.checker { flex: 1; height: 22px; border-radius: 4px;
+  background: conic-gradient(var(--cyan) 25%, #E4C3F5 0 50%, var(--cyan) 0 75%, #E4C3F5 0) 0 0 / 16px 16px; }
+
+/* 시작 화면 */
+.title-screen { overflow: hidden; justify-content: flex-start; gap: 0; container-type: size; }
+.hud { width: 100%; display: flex; justify-content: space-between; align-items: flex-start; padding: 18px 18px 0;
+  color: var(--cyan); font-size: 12px; line-height: 1.5; }
+.hearts { display: flex; gap: 5px; }
+.hearts img { width: 21px; }
+.hero { position: relative; width: 94%; margin-top: 9cqh; display: flex; flex-direction: column; align-items: center; z-index: 1; }
+.star { position: relative; z-index: 1; width: min(23%, 12cqh); margin-bottom: 4px; animation: float 3s ease-in-out infinite; }
+.hero h1 { position: relative; z-index: 1; width: 94%; }
+.logo { width: 100%; }
+.ring { position: absolute; width: 104%; left: -2%; bottom: -24%; pointer-events: none; opacity: .95; }
+.tagline { position: relative; z-index: 2; margin-top: 8cqh; font-size: 14px; font-weight: 700; color: var(--lilac); letter-spacing: 1px; text-shadow: 2px 2px 0 var(--ink); }
+.tagline b { color: var(--purple); margin: 0 4px; }
+.start { position: relative; z-index: 2; margin-top: 6cqh; padding: 15px 30px; font-size: 24px; font-weight: 700;
+  background: #8A6BC9; border: 3px solid var(--cyan); border-radius: 12px;
+  box-shadow: 0 0 0 3px var(--ink), 0 0 0 6px var(--lilac), 0 10px 0 3px var(--ink); animation: pulse 1.4s steps(2, jump-none) infinite; }
+.start:active { transform: translateY(5px); box-shadow: 0 0 0 3px var(--ink), 0 0 0 6px var(--lilac), 0 5px 0 3px var(--ink); }
+.skyline { position: absolute; left: 0; bottom: 0; width: 100%; max-height: 38cqh; object-fit: cover; object-position: top; border-radius: 0 0 16px 16px; }
+.spark, .planet { position: absolute; image-rendering: pixelated; }
+.spark { width: 14px; animation: twinkle 2.4s ease-in-out infinite; }
+.s1 { left: 10%; top: 19%; width: 25px; } .s2 { right: 9%; top: 24%; width: 21px; animation-delay: .6s; }
+.s3 { left: 20%; top: 62%; animation-delay: 1.1s; } .s4 { right: 17%; top: 66%; animation-delay: 1.7s; } .s5 { left: 54%; top: 11%; width: 10px; animation-delay: .3s; }
+.planet { right: 8%; top: 13%; width: 44px; }
+
+/* 게임 선택 화면 */
+.lobby { justify-content: flex-start; gap: 0; overflow: hidden; }
+.lobby-head { width: 100%; display: flex; align-items: center; gap: 12px; padding: 16px 16px 12px; }
+.lobby-head h2 { font-size: 24px; color: var(--cyan); outline: none; }
+.game-grid { width: 100%; min-height: 0; flex: 1; overflow-y: auto; overscroll-behavior: contain; list-style: none;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 16px 12px; padding: 4px 16px 20px; }
+.game-grid li { display: flex; }
+.card { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 8px 12px; text-align: center;
+  color: var(--ink); background: var(--lilac); border: 3px solid var(--ink); border-radius: 16px; box-shadow: 0 5px 0 var(--ink); }
+li:nth-child(4n+1) .card, li:nth-child(4n+4) .card { background: var(--cyan); }
+.card:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink); }
+.card img { width: 68px; height: 68px; image-rendering: pixelated; }
+.card strong { font-size: 18px; }
+.card p { font-size: 12px; line-height: 1.5; }
+.tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: auto; }
+.tags span { font-size: 11px; padding: 2px 6px; border-radius: 6px; background: var(--white); }
+.badge { font-style: normal; position: absolute; top: -8px; right: -4px; font-size: 11px; padding: 2px 6px; background: var(--ink); color: var(--white); border-radius: 6px; }
+.notice { grid-column: 1 / -1; text-align: center; padding: 32px 8px; line-height: 1.8; }
+
+/* 조작대 */
+.panel { flex: none; height: clamp(86px, 15dvh, 130px); display: flex; align-items: center; justify-content: space-between; padding: 0 30px;
+  border-top: 5px solid var(--lilac); box-shadow: 0 -3px 0 var(--ink);
+  background: conic-gradient(#ffffff2e 25%, transparent 0 50%, #ffffff2e 0 75%, transparent 0) 0 0 / 44px 44px, linear-gradient(#C9A5F0, #DDB1EC); }
+.joystick { position: relative; width: 84px; height: 82px; }
+.joystick i { position: absolute; left: 50%; transform: translateX(-50%); border: 3px solid var(--ink); }
+.ball { top: 0; width: 44px; height: 44px; border-radius: 50%; z-index: 2; background: radial-gradient(circle at 35% 30%, #fff 0 8%, #E5B5F3 22%, var(--purple) 70%); }
+.stick { top: 36px; width: 14px; height: 34px; background: #D9E4FF; z-index: 1; }
+.base { bottom: 0; width: 84px; height: 24px; border-radius: 50%; background: #9C82D2; }
+.buttons { display: grid; grid-template-columns: repeat(6, 26px); gap: 4px 2px; }
+.buttons i { grid-column: span 2; width: 48px; height: 28px; border-radius: 50%; border: 3px solid var(--ink); background: var(--cyan); box-shadow: 0 6px 0 var(--ink); }
+.buttons i:nth-child(even) { background: #E3A9EE; }
+.buttons i:nth-child(4) { grid-column: 2 / span 2; }
+.buttons i:nth-child(5) { grid-column: 4 / span 2; }
+
+/* 게임 선택 화면과 낮은 화면에서는 장식을 줄여 공간 확보 */
+.cabinet:has(.lobby:not([hidden])) .panel { display: none; }
+@media (max-height: 640px) { .panel, .planet, .hud p { display: none; } }
+
+@keyframes float { 50% { transform: translateY(-6px); } }
+@keyframes twinkle { 50% { opacity: .3; } }
+@keyframes pulse { 50% { filter: brightness(1.18); } }

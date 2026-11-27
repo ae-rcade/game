@@ -1,0 +1,9 @@
+{
+  "title": "블록 쌓기",
+  "description": "블록을 맞춰 줄을 없애요",
+  "modes": [
+    "개인",
+    "2인"
+  ],
+  "ready": false
+}

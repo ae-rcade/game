@@ -1,0 +1,59 @@
+/* 모든 화면이 함께 쓰는 색상·글꼴·기본 틀. 게임별 스타일은 각 게임 폴더에 작성해요. */
+@font-face { font-family: Galmuri; src: url("../assets/fonts/Galmuri11.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: Galmuri; src: url("../assets/fonts/Galmuri11-Bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+
+:root {
+  --cyan: #9CEAFE;
+  --purple: #C88DDD;
+  --ink: #4B3A8C;
+  --night: #5A48A0;
+  --lilac: #E9D3FA;
+  --white: #FFFFFF;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: #2B2156;
+  color: var(--white);
+  font-family: Galmuri, system-ui, sans-serif;
+  word-break: keep-all;
+  -webkit-tap-highlight-color: transparent;
+}
+a { color: inherit; text-decoration: none; }
+img { display: block; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px dashed var(--white); outline-offset: 3px; }
+
+/* 세로 화면 틀: 넓은 화면에서는 가운데 정렬 (PC·가로 전용 화면은 추후 추가) */
+.app {
+  width: 100%; max-width: 480px; height: 100vh; height: 100dvh; margin: 0 auto;
+  display: flex; flex-direction: column; overflow: hidden;
+  background: linear-gradient(180deg, #D9B8F3 0%, var(--purple) 55%, #A9B9F4 100%);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.screen {
+  position: relative; flex: 1; min-height: 0; margin: 10px 14px 14px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+  background: linear-gradient(180deg, var(--ink) 0%, #7E67C4 70%, #A98BDD 100%);
+  border: 4px solid var(--lilac); border-radius: 22px;
+  box-shadow: 0 0 0 3px var(--ink), inset 0 0 0 3px var(--ink);
+}
+.topbar { display: flex; align-items: center; gap: 12px; padding: 12px 14px 2px; }
+.topbar h1 { font-size: 24px; text-shadow: 2px 2px 0 var(--ink); }
+.btn-back {
+  width: 44px; height: 44px; display: grid; place-items: center; flex: none;
+  background: var(--cyan); color: var(--ink); border: 3px solid var(--ink); border-radius: 12px;
+  box-shadow: 0 4px 0 var(--ink);
+}
+.btn-back:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+.soon { font-size: 24px; font-weight: 700; color: var(--cyan); }
+
+/* 휴대폰을 가로로 돌렸을 때 안내 */
+@media (orientation: landscape) and (pointer: coarse) and (max-height: 600px) {
+  .app { visibility: hidden; }
+  body::after {
+    content: "↻  휴대폰을 세로로 돌려주세요"; position: fixed; inset: 0;
+    display: grid; place-items: center; font-size: 18px; color: var(--cyan);
+  }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
