@@ -1,5 +1,5 @@
 // 화면과 무관한 퀴즈 규칙: 표(CSV) 읽기, 정답 판정, 점수
-export const DURATION_MS = 90_000;           // 타임어택 시간
+export const DURATION_MS = 150_000;           // 타임어택 시간
 export const COUNTDOWN_MS = 3000;
 export const POINTS = [100, 100, 60, 20];    // 가사를 1, 2, 3, 4줄 열었을 때 점수
 export const FREE_LINES = 2;                 // 문제가 나오자마자 보여주는 줄 수

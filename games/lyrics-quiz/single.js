@@ -1,4 +1,4 @@
-// 싱글 모드: 90초 타임어택
+// 싱글 모드: 150초 타임어택
 import {
   DURATION_MS, COUNTDOWN_MS, LINE_DELAYS_MS, FREE_LINES, WRONG_PENALTY, REVEAL_MS, pointsFor, isCorrect, shuffle, pickLines, titleMasker,
 } from './quiz.js';
