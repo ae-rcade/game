@@ -30,6 +30,8 @@ export class Ranking extends DurableObject {
         name TEXT NOT NULL, score INTEGER NOT NULL, created INTEGER NOT NULL);
       CREATE INDEX IF NOT EXISTS scores_rank ON scores (mode, score DESC, id);
     `);
+    // 한 번만 쓰는 정리: 요청받은 시험 기록 삭제
+    this.sql.exec("DELETE FROM scores WHERE mode = 'time120' AND name = 'test_1' AND score = 1099");
   }
 
   allow(address) {
