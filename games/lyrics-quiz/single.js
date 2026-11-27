@@ -2,6 +2,7 @@
 import {
   DURATION_MS, COUNTDOWN_MS, LINE_DELAYS_MS, FREE_LINES, WRONG_PENALTY, REVEAL_MS, pointsFor, isCorrect, shuffle, pickLines, titleMasker,
 } from './quiz.js';
+import { clearInput } from './ime.js';
 
 const $ = (id) => document.getElementById(id);
 // 최고 점수는 난이도별로 따로 저장해요.
@@ -66,7 +67,7 @@ export function createSingle({ onFinish }) {
       item.append(box);
       return item;
     }));
-    $('answer').value = '';
+    clearInput($('answer'));
     while (run.opened < Math.min(FREE_LINES, run.lines.length)) openLine();
     $('card').scrollTop = 0;
   }
@@ -84,7 +85,7 @@ export function createSingle({ onFinish }) {
     $('reveal-title').textContent = question().title;
     $('reveal').className = `reveal ${kind}`;
     $('reveal').hidden = false;
-    $('answer').value = '';
+    clearInput($('answer'));
     const now = performance.now();
     run.reveal = { from: now, until: now + REVEAL_MS };
   }

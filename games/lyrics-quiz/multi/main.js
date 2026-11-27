@@ -2,6 +2,7 @@
 import { POINTS, LINE_DELAYS_MS, WRONG_PENALTY } from '../quiz.js';
 import { MIN_PLAYERS, MAX_PLAYERS, COUNT, ANSWER_MS, CODE_LENGTH, cleanName, cleanCode, rank } from './rules.js';
 import { connect } from './net.js';
+import { clearInput } from '../ime.js';
 
 const $ = (id) => document.getElementById(id);
 const VIEWS = ['menu', 'entry', 'lobby', 'play', 'result'];
@@ -128,7 +129,7 @@ function render(next) {
     renderResult();
   } else {
     show('play');
-    renderPlay();
+    renderPlay(previous !== state.phase);
     // 게임이 시작되면 입력 칸에 포커스해요(휴대폰은 칸을 눌러야 키보드가 열릴 수 있어요).
     if (previous !== state.phase && state.phase === 'countdown') $('answer').focus({ preventScroll: true });
   }
@@ -177,7 +178,7 @@ function renderScoreboard() {
   }));
 }
 
-function renderPlay() {
+function renderPlay(entered) {
   renderScoreboard();
   const q = state.question;
   const counting = state.phase === 'countdown';
@@ -193,7 +194,7 @@ function renderPlay() {
         item.append(el('p', '?', 'locked'));
         return item;
       }));
-      $('answer').value = '';
+      clearInput($('answer'));
       $('card').scrollTop = 0;
     }
     $('number').textContent = `문제 ${q.index + 1} / ${q.total}`;
@@ -217,7 +218,7 @@ function renderPlay() {
       : kind === 'bad' ? '모두 오답!' : '시간 종료!';
     $('reveal-title').textContent = title;
     $('reveal').className = `reveal ${kind === 'good' && mine ? 'good' : kind === 'good' ? 'other' : 'bad'}`;
-    $('answer').value = '';
+    if (entered) clearInput($('answer'));
   }
   const locked = state.phase === 'question' && state.players.find((p) => p.id === you)?.locked;
   $('hint').textContent = locked ? `오답 -${WRONG_PENALTY}점 · 이번 문제는 더 답할 수 없어요` : '';
@@ -304,7 +305,7 @@ $('form').addEventListener('submit', (event) => {
   setTimeout(() => {
     if (state?.phase !== 'question' || state.players.find((p) => p.id === you)?.locked) return;
     const text = $('answer').value.trim();
-    if (text && link?.send({ type: 'answer', index: state.question.index, text })) $('answer').value = '';
+    if (text && link?.send({ type: 'answer', index: state.question.index, text })) clearInput($('answer'));
   });
 });
 // 버튼을 눌러도 휴대폰 키보드가 닫히지 않게 해요.
