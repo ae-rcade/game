@@ -6,7 +6,7 @@ const canvas = $('board');
 const ctx = canvas.getContext('2d');
 const BEST_KEY = 'ae-rcade.watermelon.best';
 
-let levels, sprites, game, aimX = WIDTH / 2, aiming = false, effects = [], best = readBest();
+let levels, sprites, thumbs, game, aimX = WIDTH / 2, aiming = false, effects = [], best = readBest();
 
 function readBest() {
   try { return Number(localStorage.getItem(BEST_KEY)) || 0; } catch { return 0; }
@@ -19,30 +19,39 @@ const loadImage = (src) => new Promise((resolve) => {
   const img = new Image();
   img.onload = () => resolve(img);
   img.onerror = () => resolve(null);
-  img.src = src;
+  // 같은 이름으로 다시 올린 그림이 바로 반영되도록 저장된 사본을 확인해요.
+  fetch(src, { cache: 'no-cache' }).catch(() => {}).finally(() => { img.src = src; });
 });
+
+// 그림 파일이 없으면 단계 번호가 적힌 원을 대신 만들어요.
+function numberBall(number) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const g = c.getContext('2d');
+  g.fillStyle = '#9CEAFE';
+  g.beginPath(); g.arc(64, 64, 64, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#4B3A8C'; g.font = '700 64px Galmuri, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText(number, 64, 64);
+  return c;
+}
 
 function drawPiece(level, x, y, angle = 0) {
   const r = levels[level].radius;
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(angle);
-  if (sprites[level]) {
-    ctx.drawImage(sprites[level], -r, -r, r * 2, r * 2);
-  } else {
-    // 그림 파일이 없으면 단계 번호가 적힌 원으로 대신해요.
-    ctx.fillStyle = '#9CEAFE';
-    ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#4B3A8C'; ctx.font = `700 ${r}px Galmuri`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(level + 1, 0, 0);
-  }
+  // 원 밖은 잘라내고, 정사각형이 아닌 그림은 가운데를 기준으로 원을 채워요.
+  const img = sprites[level];
+  const side = Math.min(img.width, img.height);
+  ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.clip();
+  ctx.imageSmoothingEnabled = side > 128; // 작은 픽셀 그림은 또렷하게, 큰 사진은 부드럽게
+  ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, -r, -r, r * 2, r * 2);
   ctx.restore();
 }
 
 function draw() {
   const { state } = game;
   ctx.setTransform(canvas.width / WIDTH, 0, 0, canvas.height / HEIGHT, 0, 0);
-  ctx.imageSmoothingEnabled = false;
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
   ctx.setLineDash([8, 8]);
@@ -84,7 +93,7 @@ function hud() {
   if (state.score > best) { best = state.score; saveBest(); }
   $('score').textContent = state.score;
   $('best').textContent = best;
-  const src = levels[state.next].image;
+  const src = thumbs[state.next];
   if ($('next').getAttribute('src') !== src) $('next').src = src;
   if (state.over && $('over').hidden) {
     $('final').textContent = state.score;
@@ -132,16 +141,18 @@ async function init() {
     const res = await fetch('characters.json', { cache: 'no-cache' });
     if (!res.ok) throw new Error(`characters.json: ${res.status}`);
     levels = await res.json();
-    sprites = await Promise.all(levels.map((l) => loadImage(l.image)));
+    const images = await Promise.all(levels.map((l) => loadImage(l.image)));
+    sprites = images.map((img, i) => img || numberBall(i + 1));
+    thumbs = images.map((img, i) => (img ? levels[i].image : sprites[i].toDataURL()));
   } catch (error) {
     console.error(error);
     $('error').hidden = false;
     return;
   }
-  for (const level of levels) {
+  for (const [i, level] of levels.entries()) {
     const item = document.createElement('li');
     const img = document.createElement('img');
-    img.src = level.image;
+    img.src = thumbs[i];
     img.alt = level.name;
     item.append(img);
     $('order').append(item);

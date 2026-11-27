@@ -9,12 +9,18 @@
 - `engine.js` 규칙과 물리
 - `main.js` 화면과 터치 입력
 - `characters.json` 단계별 이름·그림·크기(`radius`)·점수. 위에서부터 작은 순서
-- `images/` 캐릭터 그림 (현재 파일은 임시 캐릭터)
+- `images/` 캐릭터 그림 (`ball1.png` ~ `ball9.png`, 현재는 임시 캐릭터)
 - `vendor/` Matter.js 물리 라이브러리 (MIT)
 
 ## 그림 교체
 
-직접 만든 그림이나 사용 허락을 받은 그림만 올려요.
-정사각형 투명 배경 PNG에 둥근 캐릭터를 가장자리까지 꽉 차게 그리고,
-`images/1.png` ~ `images/9.png`를 덮어쓰면 돼요.
-파일 이름을 바꾸면 `characters.json`의 `image`도 함께 고쳐요.
+직접 만든 그림이나 사용 허락을 받은 그림만 올려요 (이 저장소와 사이트는 공개예요).
+
+1. GitHub에서 `games/watermelon/images` 폴더를 열어요.
+2. **Add file → Upload files**에서 `ball1.png`(가장 작음) ~ `ball9.png`(가장 큼)를 올려요.
+3. **Commit changes**를 누르고 몇 분 뒤 새로고침해요.
+
+- 같은 이름의 파일은 덮어써져요. 이름은 소문자로, 확장자는 `.png`로 맞춰요.
+- 권장: 512×512 정도의 정사각형 투명 배경 PNG, 얼굴을 원에 꽉 차게.
+- 원 밖은 잘려 보여요. 파일이 없으면 번호가 적힌 공이 대신 나와요.
+- 크기와 점수는 `characters.json`의 `radius`, `score`에서 바꿔요.

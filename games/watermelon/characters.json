@@ -1,11 +1,11 @@
 [
-  {"name": "1단계", "image": "images/1.png", "radius": 15, "score": 1},
-  {"name": "2단계", "image": "images/2.png", "radius": 20, "score": 3},
-  {"name": "3단계", "image": "images/3.png", "radius": 26, "score": 6},
-  {"name": "4단계", "image": "images/4.png", "radius": 32, "score": 10},
-  {"name": "5단계", "image": "images/5.png", "radius": 39, "score": 15},
-  {"name": "6단계", "image": "images/6.png", "radius": 47, "score": 21},
-  {"name": "7단계", "image": "images/7.png", "radius": 56, "score": 28},
-  {"name": "8단계", "image": "images/8.png", "radius": 68, "score": 36},
-  {"name": "9단계", "image": "images/9.png", "radius": 82, "score": 45}
+  {"name": "1단계", "image": "images/ball1.png", "radius": 15, "score": 1},
+  {"name": "2단계", "image": "images/ball2.png", "radius": 20, "score": 3},
+  {"name": "3단계", "image": "images/ball3.png", "radius": 26, "score": 6},
+  {"name": "4단계", "image": "images/ball4.png", "radius": 32, "score": 10},
+  {"name": "5단계", "image": "images/ball5.png", "radius": 39, "score": 15},
+  {"name": "6단계", "image": "images/ball6.png", "radius": 47, "score": 21},
+  {"name": "7단계", "image": "images/ball7.png", "radius": 56, "score": 28},
+  {"name": "8단계", "image": "images/ball8.png", "radius": 68, "score": 36},
+  {"name": "9단계", "image": "images/ball9.png", "radius": 82, "score": 45}
 ]
