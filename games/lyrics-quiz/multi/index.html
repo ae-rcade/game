@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#C88DDD">
+  <title>가사 맞추기 멀티 · ae-rcade</title>
+  <link rel="stylesheet" href="../../../shared/theme.css">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <a class="btn-back" id="back" href="../index.html" aria-label="뒤로">◀</a>
+      <h1>가사 맞추기</h1>
+    </header>
+    <p class="banner" id="banner" role="status" hidden></p>
+
+    <section class="screen" id="menu">
+      <img class="game-icon" src="../icon.svg" alt="">
+      <h2>멀티 모드</h2>
+      <p class="note" id="menu-message" aria-live="polite"></p>
+      <button type="button" class="mode" id="to-create" disabled><strong>방 만들기</strong><span>코드를 만들어 친구를 불러요</span></button>
+      <button type="button" class="mode alt" id="to-join" disabled><strong>참여하기</strong><span>방 코드 4자리로 들어가요</span></button>
+      <a class="action plain" href="../index.html">모드 선택으로</a>
+    </section>
+
+    <section class="screen" id="entry" hidden>
+      <h2 id="entry-title"></h2>
+      <form class="entry" id="entry-form" novalidate>
+        <label>닉네임<input id="nickname" type="text" maxlength="10" placeholder="최대 10자" autocomplete="off" enterkeyhint="done"></label>
+        <label id="code-field">방 코드<input id="code-input" type="text" maxlength="4" placeholder="4자리" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" enterkeyhint="go"></label>
+        <p class="note error" id="entry-message" aria-live="assertive"></p>
+        <button type="submit" class="action primary" id="enter"></button>
+      </form>
+    </section>
+
+    <section class="screen" id="lobby" hidden>
+      <h2>대기 화면</h2>
+      <div class="code-box">
+        <p>방 코드 (비밀번호)</p>
+        <strong id="room-code"></strong>
+        <button type="button" class="action plain" id="copy">코드 복사</button>
+      </div>
+      <p class="note" id="people"></p>
+      <ul class="members" id="members" aria-live="polite"></ul>
+      <div class="stepper">
+        <span>문제 수</span>
+        <button type="button" class="action plain" id="less" aria-label="문제 수 줄이기">−</button>
+        <strong id="count" aria-live="polite"></strong>
+        <button type="button" class="action plain" id="more" aria-label="문제 수 늘리기">+</button>
+      </div>
+      <button type="button" class="action level" id="level"></button>
+      <p class="note" id="lobby-message" aria-live="polite"></p>
+      <button type="button" class="action primary" id="start">▶ 시작하기</button>
+      <button type="button" class="action plain" data-leave>방 나가기</button>
+      <ul class="tips">
+        <li>먼저 맞힌 한 사람만 점수를 얻어요<small id="tip-points"></small></li>
+        <li id="tip-lines"></li>
+        <li id="tip-wrong"></li>
+        <li id="tip-level" aria-live="polite"></li>
+      </ul>
+    </section>
+
+    <div class="play" id="play" hidden>
+      <ul class="scoreboard" id="scoreboard" aria-label="점수"></ul>
+      <section class="screen card-screen">
+        <div class="card" id="card">
+          <p class="number"><span id="number"></span><span id="time" role="timer"></span><span id="worth"></span></p>
+          <ol id="lines" aria-live="polite"></ol>
+        </div>
+        <p class="countdown" id="countdown" aria-live="assertive" hidden></p>
+        <div class="reveal" id="reveal" role="status" hidden>
+          <p id="reveal-label"></p>
+          <strong id="reveal-title"></strong>
+        </div>
+      </section>
+      <p class="hint" id="hint" aria-live="assertive"></p>
+      <form class="answer" id="form">
+        <input id="answer" type="text" placeholder="노래 제목" aria-label="노래 제목" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="send">
+        <button type="submit" class="action primary" id="submit">확인</button>
+      </form>
+    </div>
+
+    <section class="screen" id="result" hidden>
+      <h2>게임 종료!</h2>
+      <p class="note" id="result-level"></p>
+      <ol class="ranking" id="ranking" aria-label="순위"></ol>
+      <ul class="history" id="history" aria-label="나온 문제와 맞힌 사람"></ul>
+      <p class="note" id="result-message" aria-live="polite"></p>
+      <button type="button" class="action primary" id="again">대기 화면으로 (한 판 더)</button>
+      <button type="button" class="action plain" data-leave>방 나가기</button>
+    </section>
+  </main>
+  <script type="module" src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+/* 멀티 모드 전용 스타일. 기본 모양은 ../style.css(싱글과 공통)를 써요. */
+#entry, #lobby { justify-content: safe center; overflow-y: auto; padding: 18px 14px; }
+.mode:disabled { cursor: default; }
+.banner { margin: 6px 14px 0; padding: 6px 10px; font-size: 12px; text-align: center; color: var(--ink); background: #FFF3B0; border: 2px solid var(--ink); border-radius: 10px; }
+.note:empty { display: none; }
+.note.error { color: #FFF3B0; }
+
+.entry { width: 100%; display: flex; flex-direction: column; gap: 14px; }
+.entry label { display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+.entry input { width: 100%; padding: 11px 10px; font: 18px Galmuri, system-ui, sans-serif; text-align: center; color: var(--ink); border: 3px solid var(--ink); border-radius: 12px; }
+#code-input { letter-spacing: .3em; text-transform: uppercase; }
+#code-input::placeholder { letter-spacing: normal; }
+
+#lobby { gap: 10px; padding-block: 12px; }
+/* 참가자에게는 난이도가 표시만 돼요. */
+#level:disabled { opacity: 1; }
+.code-box { width: 100%; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 10px; padding: 10px 12px; color: var(--ink); background: var(--white); border: 3px solid var(--ink); border-radius: 12px; }
+.code-box p { grid-column: 1 / -1; font-size: 12px; }
+.code-box strong { font-size: 36px; letter-spacing: .2em; user-select: all; }
+.code-box .action { width: auto; font-size: 13px; padding: 8px 10px; background: var(--cyan); }
+.members { list-style: none; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.members li { min-width: 0; min-height: 56px; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 8px 6px; text-align: center; color: var(--ink); background: var(--lilac); border: 3px solid var(--ink); border-radius: 12px; }
+.members li.me { background: var(--cyan); }
+.members li.empty { font-size: 12px; color: var(--lilac); background: rgba(43, 33, 86, .35); border: 3px dashed var(--lilac); }
+.members strong { overflow-wrap: anywhere; font-size: 15px; }
+.members span { font-size: 10px; }
+.stepper { width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 14px; }
+.stepper .action { width: 44px; padding: 6px 0; font-size: 20px; }
+.stepper strong { min-width: 76px; text-align: center; font-size: 20px; color: var(--cyan); }
+.tips { list-style: none; width: 100%; display: flex; flex-direction: column; gap: 6px; font-size: 12px; line-height: 1.6; }
+.tips li { padding: 7px 10px; border: 2px solid var(--lilac); border-radius: 10px; }
+.tips small { display: block; font-size: 11px; color: var(--cyan); }
+
+.scoreboard { list-style: none; display: grid; grid-template-columns: repeat(var(--players, 4), minmax(0, 1fr)); gap: 6px; padding: 8px 14px 0; }
+.scoreboard li { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 5px 3px; color: var(--ink); background: var(--lilac); border: 3px solid var(--ink); border-radius: 12px; }
+.scoreboard li.me { background: var(--cyan); }
+.scoreboard li.won { background: #FFE59A; }
+.scoreboard li.away { opacity: .55; }
+.scoreboard span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+.scoreboard strong { font-size: 20px; }
+.scoreboard em { min-height: 1.3em; font-size: 10px; font-style: normal; font-weight: 700; }
+.scoreboard li.wrong em { color: #D6336C; }
+.number { gap: 6px; }
+#time.urgent { color: #FF9DBB; }
+#lines p { display: grid; place-items: center; width: 100%; min-height: 54px; padding: 12px 10px; font-size: 16px; line-height: 1.6; white-space: pre-line; text-align: center; word-break: keep-all; overflow-wrap: anywhere; border: 3px solid transparent; border-radius: 12px; }
+.reveal.other p { color: var(--cyan); }
+.hint { padding: 0 14px; font-size: 12px; text-align: center; color: var(--ink); font-weight: 700; }
+.hint:empty { display: none; }
+.answer .action[aria-disabled="true"] { opacity: .45; }
+
+#result { gap: 12px; }
+.ranking { list-style: none; width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.ranking li { display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: var(--ink); background: var(--lilac); border: 3px solid var(--ink); border-radius: 12px; }
+.ranking li.first { background: #FFE59A; }
+.ranking li.me { border-color: var(--cyan); box-shadow: 0 0 0 3px var(--ink); }
+.ranking b { flex: none; font-size: 16px; }
+.ranking .name { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: 15px; }
+.ranking small { display: block; margin-top: 3px; font-size: 10px; }
+.ranking strong { flex: none; font-size: 18px; }
+
+/* 키보드가 열려 화면이 낮아졌을 때 */
+.app.compact .scoreboard { padding-top: 4px; }
+.app.compact .scoreboard li { gap: 0; padding-block: 1px; }
+.app.compact .scoreboard strong { font-size: 15px; }
+.app.compact .scoreboard em { min-height: 0; }
+.app.compact .scoreboard em:empty { display: none; }
+.app.compact #lines p { min-height: 36px; padding-block: 3px; font-size: 13px; line-height: 1.45; }
+body:has(input:focus) .app { visibility: visible; }
+body:has(input:focus)::after { display: none; }

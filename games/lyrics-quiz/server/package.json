@@ -1,0 +1,7 @@
+{
+  "name": "ae-rcade-lyrics",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "wrangler dev", "deploy": "wrangler deploy" },
+  "devDependencies": { "wrangler": "4.168.0" }
+}
