@@ -1,5 +1,7 @@
 // 싱글 모드: 90초 타임어택
-import { DURATION_MS, COUNTDOWN_MS, LINE_DELAYS_MS, pointsFor, isCorrect, shuffle } from './quiz.js';
+import {
+  DURATION_MS, COUNTDOWN_MS, LINE_DELAYS_MS, WRONG_PENALTY, REVEAL_MS, pointsFor, isCorrect, shuffle, pickLines,
+} from './quiz.js';
 
 const $ = (id) => document.getElementById(id);
 const BEST_KEY = 'ae-rcade.lyrics-quiz.best';
@@ -10,20 +12,16 @@ function readBest() {
 const name = (q) => (q.artist ? `${q.title} - ${q.artist}` : q.title);
 
 export function createSingle({ onFinish }) {
-  let run = null; // { questions, index, opened, unlockAt, score, correct, history, startsAt, endsAt, timer }
+  let run = null; // { questions, index, lines, opened, unlockAt, reveal, score, correct, history, startsAt, endsAt, timer }
 
   const question = () => run.questions[run.index];
-  const playing = () => run && performance.now() >= run.startsAt;
-
-  function say(text, kind = '') {
-    $('feedback').textContent = text;
-    $('feedback').className = `feedback ${kind}`;
-  }
+  // 카운트다운 중이거나 정답을 보여주는 동안에는 입력을 받지 않아요.
+  const playing = () => run && !run.reveal && performance.now() >= run.startsAt;
 
   // 다음 줄을 열고, 그다음 줄의 대기 시간을 시작해요.
   function openLine() {
     const box = $('lines').children[run.opened].firstChild;
-    box.textContent = question().lines[run.opened];
+    box.textContent = run.lines[run.opened];
     run.opened++;
     run.unlockAt = performance.now() + (LINE_DELAYS_MS[run.opened] || 0);
     $('worth').textContent = `맞히면 ${pointsFor(run.opened)}점`;
@@ -47,13 +45,14 @@ export function createSingle({ onFinish }) {
       box.setAttribute('aria-label', ready ? `${i + 1}번째 줄 열기` : `${i + 1}번째 줄은 아직 열 수 없어요`);
     });
     // 준비된 줄을 모두 연 뒤에만 패스할 수 있어요.
-    $('pass').setAttribute('aria-disabled', run.opened < question().lines.length);
+    $('pass').setAttribute('aria-disabled', run.opened < run.lines.length);
   }
 
   function showQuestion() {
     run.opened = 0;
+    run.lines = pickLines(question().lines);
     $('number').textContent = `문제 ${run.index + 1}`;
-    $('lines').replaceChildren(...question().lines.map((_, i) => {
+    $('lines').replaceChildren(...run.lines.map((_, i) => {
       const item = document.createElement('li');
       const box = document.createElement('button');
       box.type = 'button';
@@ -73,8 +72,24 @@ export function createSingle({ onFinish }) {
     $('correct').textContent = run.correct;
   }
 
-  function advance(solved) {
-    run.history.push({ title: name(question()), solved });
+  // 결과와 정답을 잠깐 보여준 뒤 다음 문제로 넘어가요. kind: 'good' 정답, 'bad' 오답, 'skip' 패스
+  function resolve(kind, label) {
+    run.history.push({ title: name(question()), kind });
+    status();
+    $('reveal-label').textContent = label;
+    $('reveal-title').textContent = question().title;
+    $('reveal').className = `reveal ${kind}`;
+    $('reveal').hidden = false;
+    $('answer').value = '';
+    const now = performance.now();
+    run.reveal = { from: now, until: now + REVEAL_MS };
+  }
+
+  function next() {
+    // 정답을 보여준 시간만큼 남은 시간을 돌려줘요.
+    run.endsAt += performance.now() - run.reveal.from;
+    run.reveal = null;
+    $('reveal').hidden = true;
     run.index++;
     if (run.index >= run.questions.length) finish('done');
     else showQuestion();
@@ -83,17 +98,22 @@ export function createSingle({ onFinish }) {
   function finish(reason) {
     clearInterval(run.timer);
     // 시간이 끝났을 때 풀던 문제도 정답 목록에 보여줘요.
-    if (reason === 'time') run.history.push({ title: name(question()), solved: false });
+    if (reason === 'time') run.history.push({ title: name(question()), kind: 'timeout' });
     const { score, correct, history } = run;
     const best = Math.max(readBest(), score);
     try { localStorage.setItem(BEST_KEY, String(best)); } catch { /* 저장이 막힌 브라우저 */ }
     run = null;
+    $('reveal').hidden = true;
     $('answer').blur();
     onFinish({ reason, score, correct, history, best });
   }
 
   function tick() {
     const now = performance.now();
+    if (run.reveal) {
+      if (now >= run.reveal.until) next();
+      return;
+    }
     const waiting = now < run.startsAt;
     $('countdown').hidden = !waiting;
     $('card').classList.toggle('waiting', waiting);
@@ -117,29 +137,26 @@ export function createSingle({ onFinish }) {
         const points = pointsFor(run.opened);
         run.score += points;
         run.correct++;
-        say(`정답! +${points}점 · ${question().title}`, 'good');
-        status();
-        advance(true);
+        resolve('good', `정답! +${points}점`);
       } else {
-        say(`"${typed}"은(는) 아니에요`, 'bad');
-        $('answer').value = '';
+        run.score -= WRONG_PENALTY;
+        resolve('bad', `오답 -${WRONG_PENALTY}점`);
       }
     });
   });
   $('pass').addEventListener('click', () => {
-    if (!playing() || run.opened < question().lines.length) return;
-    say(`패스! 정답은 "${question().title}"`);
-    advance(false);
+    if (!playing() || run.opened < run.lines.length) return;
+    resolve('skip', '패스');
   });
   // 버튼을 눌러도 휴대폰 키보드가 닫히지 않게 해요.
-  for (const id of ['card', 'pass', 'submit']) $(id).addEventListener('mousedown', (e) => e.preventDefault());
+  for (const id of ['card', 'reveal', 'pass', 'submit']) $(id).addEventListener('mousedown', (e) => e.preventDefault());
 
   return {
     start(questions) {
       this.stop();
       const startsAt = performance.now() + COUNTDOWN_MS;
       run = { questions: shuffle(questions), index: 0, opened: 0, score: 0, correct: 0, history: [], startsAt, endsAt: startsAt + DURATION_MS };
-      say('');
+      $('reveal').hidden = true;
       status();
       showQuestion();
       run.timer = setInterval(tick, 100);

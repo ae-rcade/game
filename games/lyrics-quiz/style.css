@@ -35,15 +35,17 @@ h2 { font-size: 24px; color: var(--cyan); text-align: center; }
 .card.waiting { visibility: hidden; }
 .number { display: flex; justify-content: space-between; font-size: 13px; color: var(--cyan); }
 #lines { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-#lines button { width: 100%; min-height: 54px; padding: 12px 10px; font: 18px/1.6 Galmuri, system-ui, sans-serif; text-align: center; word-break: keep-all; overflow-wrap: anywhere; border: 3px solid transparent; border-radius: 12px; }
+#lines button { width: 100%; min-height: 54px; padding: 12px 10px; font: 16px/1.6 Galmuri, system-ui, sans-serif; white-space: pre-line; text-align: center; word-break: keep-all; overflow-wrap: anywhere; border: 3px solid transparent; border-radius: 12px; }
 #lines .open { color: var(--ink); background: var(--white); }
 #lines .ready { color: var(--ink); background: var(--cyan); border-color: var(--ink); box-shadow: 0 4px 0 var(--ink); font-weight: 700; cursor: pointer; }
 #lines .locked { color: var(--lilac); background: rgba(43, 33, 86, .35); border: 3px dashed var(--lilac); }
 .answer .action[aria-disabled="true"] { opacity: .45; cursor: default; }
 .countdown { position: absolute; inset: 0; display: grid; place-items: center; font-size: 64px; font-weight: 700; color: var(--cyan); text-shadow: 4px 4px 0 var(--ink); }
-.feedback { min-height: 22px; padding: 0 14px; text-align: center; font-size: 13px; line-height: 22px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 1px 1px 0 var(--ink); }
-.feedback.good { color: #FFF3B0; font-weight: 700; }
-.feedback.bad { color: #7A1038; text-shadow: none; font-weight: 700; }
+.reveal { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 16px; text-align: center; border-radius: 18px; background: rgba(43, 33, 86, .94); }
+.reveal p { font-size: 22px; font-weight: 700; color: var(--lilac); }
+.reveal.good p { color: #FFF3B0; }
+.reveal.bad p { color: #FF9DBB; }
+.reveal strong { font-size: 24px; line-height: 1.5; overflow-wrap: anywhere; }
 .answer { display: flex; gap: 8px; padding: 6px 14px 16px; }
 .answer .action { width: auto; flex: none; padding-inline: 12px; }
 .answer input { flex: 1; min-width: 0; padding: 10px; font: 16px Galmuri, system-ui, sans-serif; color: var(--ink); border: 3px solid var(--ink); border-radius: 12px; }
@@ -62,7 +64,8 @@ h2 { font-size: 24px; color: var(--cyan); text-align: center; }
 .app.compact .answer { padding-bottom: 8px; }
 .app.compact .card { gap: 6px; padding-block: 8px; }
 .app.compact #lines { gap: 6px; }
-.app.compact #lines button { min-height: 40px; padding-block: 5px; font-size: 15px; }
+.app.compact #lines button { min-height: 36px; padding-block: 3px; font-size: 13px; line-height: 1.45; }
+.app.compact .reveal { gap: 8px; }
 /* 키보드 때문에 화면이 가로 비율이 되어도 '세로로 돌려주세요' 안내가 뜨지 않게 해요. */
 body:has(#answer:focus) .app { visibility: visible; }
 body:has(#answer:focus)::after { display: none; }

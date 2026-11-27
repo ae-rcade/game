@@ -29,7 +29,7 @@ export async function loadQuestions() {
   if (/^\s*</.test(text)) throw fail('표 대신 웹페이지가 왔어요. 게시 형식을 CSV로 선택해 주세요.');
   let questions;
   try {
-    questions = toQuestions(parseCSV(text));
+    questions = toQuestions(parseCSV(text), { skipSample: Boolean(url) });
   } catch (error) {
     throw fail(error.message);
   }

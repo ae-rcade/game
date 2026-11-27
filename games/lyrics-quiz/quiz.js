@@ -4,7 +4,9 @@ export const COUNTDOWN_MS = 3000;
 export const POINTS = [100, 70, 40, 10];     // 가사를 1, 2, 3, 4줄 열었을 때 점수
 // 각 줄을 열 수 있을 때까지, 앞 줄을 연 뒤 기다리는 시간. 1번째 줄은 처음부터 보여요.
 export const LINE_DELAYS_MS = [0, 0, 3000, 5000];
-export const MAX_LINES = LINE_DELAYS_MS.length;
+export const SHOWN_LINES = LINE_DELAYS_MS.length; // 한 문제에서 보여주는 가사 칸 수
+export const WRONG_PENALTY = 20;             // 오답 감점
+export const REVEAL_MS = 1200;               // 다음 문제 전에 정답을 보여주는 시간 (남은 시간은 멈춰요)
 
 export const pointsFor = (opened) => POINTS[opened - 1];
 
@@ -29,22 +31,32 @@ export function parseCSV(text) {
   return rows;
 }
 
-// 첫 줄은 열 이름. '제목'과 '가사…' 열이 필요해요. 열 순서는 상관없어요.
-export function toQuestions(rows) {
+// 첫 줄은 열 이름. '제목'과 '가사1' 열이 필요해요.
+// '가사1'부터 오른쪽의 칸은 모두 가사예요(열 이름이 비어 있어도 돼요). 한 칸이 가사 한 줄이에요.
+// 가수 칸이 '예시 문제'인 행은 건너뛰어요(skipSample).
+export function toQuestions(rows, { skipSample = false } = {}) {
   const header = (rows[0] || []).map((h) => h.replace(/\s/g, ''));
   const title = header.indexOf('제목');
   const alias = header.findIndex((h) => h.startsWith('정답'));
   const artist = header.indexOf('가수');
-  const lyrics = header.map((h, i) => (h.startsWith('가사') ? i : -1)).filter((i) => i >= 0);
-  if (title < 0 || !lyrics.length) throw new Error('첫 줄에 "제목"과 "가사1" 열 이름이 필요해요.');
+  const first = header.findIndex((h) => h.startsWith('가사'));
+  // 가사가 아닌 이름이 붙은 열(예: 메모)은 제외해요.
+  const isLyric = (i) => i >= first && i !== title && i !== alias && i !== artist && (!header[i] || header[i].startsWith('가사'));
+  if (title < 0 || first < 0) throw new Error('첫 줄에 "제목"과 "가사1" 열 이름이 필요해요.');
   const get = (row, i) => (i < 0 ? '' : String(row[i] ?? '').trim());
   return rows.slice(1).map((row) => ({
     title: get(row, title),
     aliases: get(row, alias).split('|').map((a) => a.trim()).filter(Boolean),
     artist: get(row, artist),
-    // 한 칸 안에서 줄을 바꾼 것도 각각 한 줄로 보여줘요.
-    lines: lyrics.flatMap((i) => get(row, i).split(/\r?\n/)).map((l) => l.trim()).filter(Boolean).slice(0, MAX_LINES),
-  })).filter((q) => q.title && q.lines.length);
+    // 칸 안의 줄바꿈은 그대로 보여줘요.
+    lines: row.map((_, i) => (isLyric(i) ? get(row, i).replace(/\r\n?/g, '\n') : '')).filter(Boolean),
+  })).filter((q) => q.title && q.lines.length && !(skipSample && q.artist === '예시 문제'));
+}
+
+// 노래에서 이어지는 4줄을 무작위로 골라요. 시작 위치를 제한해 항상 4줄이 나와요.
+export function pickLines(lines, random = Math.random) {
+  const start = Math.floor(random() * Math.max(1, lines.length - SHOWN_LINES + 1));
+  return lines.slice(start, start + SHOWN_LINES);
 }
 
 // 대소문자, 띄어쓰기, 문장부호는 무시해요.

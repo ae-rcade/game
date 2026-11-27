@@ -27,10 +27,10 @@
       <h2>싱글 모드</h2>
       <ul class="rules">
         <li id="rule-time"></li>
-        <li>가사를 보고 노래 제목을 직접 입력해요</li>
+        <li>노래 속 이어지는 가사 4줄을 보고 제목을 직접 입력해요</li>
         <li>? 칸을 눌러 가사를 열어요. 적게 볼수록 점수가 높아요<small id="rule-points"></small></li>
         <li id="rule-wait"></li>
-        <li>틀려도 다시 입력할 수 있어요. 패스는 가사를 모두 연 뒤에 가능해요</li>
+        <li id="rule-wrong"></li>
       </ul>
       <p class="note" id="load-message" aria-live="polite"></p>
       <button type="button" class="action" id="reload" hidden>다시 불러오기</button>
@@ -50,8 +50,11 @@
           <ol id="lines" aria-live="polite"></ol>
         </div>
         <p class="countdown" id="countdown" aria-live="assertive" hidden></p>
+        <div class="reveal" id="reveal" role="status" hidden>
+          <p id="reveal-label"></p>
+          <strong id="reveal-title"></strong>
+        </div>
       </section>
-      <p class="feedback" id="feedback" aria-live="polite"></p>
       <form class="answer" id="form">
         <button type="button" class="action plain" id="pass">패스</button>
         <input id="answer" type="text" placeholder="노래 제목" aria-label="노래 제목" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="send">

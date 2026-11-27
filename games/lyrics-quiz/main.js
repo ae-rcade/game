@@ -1,5 +1,5 @@
 // 화면 전환: 모드 선택 → 싱글 안내 → 게임 → 결과. 규칙은 quiz.js, 게임 진행은 single.js에 있어요.
-import { DURATION_MS, POINTS, LINE_DELAYS_MS } from './quiz.js';
+import { DURATION_MS, POINTS, LINE_DELAYS_MS, WRONG_PENALTY } from './quiz.js';
 import { loadQuestions } from './data.js';
 import { createSingle } from './single.js';
 
@@ -17,10 +17,11 @@ const single = createSingle({
     $('result-title').textContent = reason === 'time' ? '시간 종료!' : '모든 문제 완료!';
     $('final').textContent = score;
     $('summary').textContent = `맞힌 문제 ${correct}개 · 내 최고 점수 ${best}점`;
-    $('history').replaceChildren(...history.map(({ title, solved }) => {
+    const marks = { good: '○', bad: '×', skip: '패스', timeout: '시간 종료' };
+    $('history').replaceChildren(...history.map(({ title, kind }) => {
       const item = document.createElement('li');
-      item.className = solved ? 'solved' : '';
-      item.textContent = `${solved ? '○' : '×'} ${title}`;
+      item.className = kind === 'good' ? 'solved' : '';
+      item.textContent = `${marks[kind]} · ${title}`;
       return item;
     }));
     show('result');
@@ -61,6 +62,7 @@ function menu() {
 
 $('rule-time').textContent = `${DURATION_MS / 1000}초 동안 최대한 많이 맞혀요`;
 $('rule-points').textContent = POINTS.map((p, i) => `${i + 1}줄 ${p}점`).join(' · ');
+$('rule-wrong').textContent = `틀리면 -${WRONG_PENALTY}점이고 다음 문제로 넘어가요. 패스는 가사를 모두 연 뒤에 가능해요`;
 $('rule-wait').textContent = `3번째 줄은 2번째 줄을 연 뒤 ${LINE_DELAYS_MS[2] / 1000}초, 4번째 줄은 3번째 줄을 연 뒤 ${LINE_DELAYS_MS[3] / 1000}초 후에 열 수 있어요`;
 $('single').addEventListener('click', prepare);
 $('reload').addEventListener('click', prepare);
