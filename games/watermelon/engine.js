@@ -7,8 +7,10 @@ export const DANGER_Y = 86;     // 이 선 위에 오래 쌓이면 게임 끝
 export const DROP_Y = 46;
 const DROP_LEVELS = 5;          // 떨어뜨릴 수 있는 단계 수(작은 것부터)
 const GRACE_MS = 1500;          // 막 떨어뜨린 캐릭터는 위험 판정에서 제외
-const LIMIT_MS = 2500;          // 위험선 위에 머물 수 있는 시간
+const LIMIT_MS = 1500;          // 위험선 위에 머물 수 있는 시간
 const COOLDOWN_MS = 500;
+// 탄력 조절: restitution이 클수록(0~1) 더 통통 튀어요.
+const BOUNCE = { restitution: 0.65, friction: 0.15, frictionStatic: 0.3, frictionAir: 0.008 };
 export const STEP_MS = 1000 / 60;
 
 export function createGame(levels, { random = Math.random, onMerge = () => {} } = {}) {
@@ -29,7 +31,7 @@ export function createGame(levels, { random = Math.random, onMerge = () => {} } 
     const r = levels[level].radius;
     const body = Bodies.circle(
       Math.min(WIDTH - r, Math.max(r, x)), Math.min(HEIGHT - r, y), r,
-      { restitution: 0.12, friction: 0.4, frictionStatic: 0.6, label: 'piece' },
+      { ...BOUNCE, label: 'piece' },
       48,
     );
     Object.assign(body, { level, born: state.time, overTime: 0, merged: false });
@@ -72,6 +74,16 @@ export function createGame(levels, { random = Math.random, onMerge = () => {} } 
     }
   }
 
+  // 꽉 눌린 캐릭터가 벽이나 바닥을 뚫고 나가면 안으로 되돌려요.
+  function keepInside(p) {
+    const half = p.circleRadius / 2;
+    const x = Math.min(WIDTH - half, Math.max(half, p.position.x));
+    const y = Math.min(HEIGHT - half, p.position.y);
+    if (x === p.position.x && y === p.position.y) return;
+    Body.setPosition(p, { x, y });
+    Body.setVelocity(p, { x: 0, y: 0 });
+  }
+
   return {
     state,
     pieces,
@@ -92,6 +104,7 @@ export function createGame(levels, { random = Math.random, onMerge = () => {} } 
       merge();
       let worst = 0;
       for (const p of pieces) {
+        keepInside(p);
         const high = state.time - p.born > GRACE_MS && p.position.y - p.circleRadius < DANGER_Y;
         p.overTime = high ? p.overTime + STEP_MS : 0;
         worst = Math.max(worst, p.overTime);
