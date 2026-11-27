@@ -68,7 +68,7 @@ export class Arena extends DurableObject {
 
   start() {
     if (this.timer !== null) return;
-    this.game = createGame({ now: Date.now });
+    this.game = createGame();
     let last = Date.now();
     this.timer = setInterval(() => {
       const now = Date.now();

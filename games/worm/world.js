@@ -3,7 +3,7 @@ import { RULES, KINDS, BASE_COLORS, radiusFor } from './rules.js';
 
 const FOOD_CELL = 80;
 const BODY_CELL = 48;
-export const REACH = 14; // 머리 반지름에 더해 먹이를 먹는 거리
+const REACH = 14; // 머리 반지름에 더해 먹이를 먹는 거리
 const key = (cx, cy) => (cx + 512) * 1024 + (cy + 512);
 
 // i번째(1부터) 몸 마디의 위치. 머리에서 i*간격만큼 뒤예요.
@@ -14,41 +14,6 @@ export function segment(worm, i, out = { x: 0, y: 0 }) {
   out.x = a.x + (b.x - a.x) * t;
   out.y = a.y + (b.y - a.y) * t;
   return out;
-}
-
-// 한 마리를 dt초만큼 움직여요. 화면도 내 지렁이를 미리 움직일 때 같이 써요.
-export function moveWorm(worm, dt) {
-  const radius = radiusFor(worm.colors.length);
-  const turn = (RULES.turnRate / (1 + (radius - 9) * 0.05)) * dt;
-  const diff = Math.atan2(Math.sin(worm.target - worm.angle), Math.cos(worm.target - worm.angle));
-  worm.angle += Math.max(-turn, Math.min(turn, diff));
-
-  let speed = RULES.speed;
-  if (worm.boostLeft > 0) {
-    speed = RULES.boostSpeed;
-    worm.boostLeft -= dt;
-    if (worm.boostLeft <= 0) {
-      worm.boostLeft = 0;
-      worm.cooldown = RULES.boostCooldownSec;
-    }
-  } else if (worm.cooldown > 0) worm.cooldown = Math.max(0, worm.cooldown - dt);
-  if (worm.shield > 0) worm.shield = Math.max(0, worm.shield - dt);
-
-  let remain = speed * dt;
-  while (remain > 1e-9) {
-    const step = Math.min(remain, RULES.spacing - worm.carry);
-    worm.x += Math.cos(worm.angle) * step;
-    worm.y += Math.sin(worm.angle) * step;
-    worm.carry += step;
-    remain -= step;
-    if (worm.carry >= RULES.spacing - 1e-9) {
-      worm.carry = 0;
-      worm.trail.unshift({ x: worm.x, y: worm.y });
-      // 먹은 만큼 꼬리 끝에 그 먹이 색의 마디가 붙어요.
-      if (worm.pending.length) worm.colors.push(worm.pending.shift());
-      while (worm.trail.length > worm.colors.length + 1) worm.trail.pop();
-    }
-  }
 }
 
 // onFoodAdd·onFoodRemove: 서버가 바뀐 먹이만 보내려고 써요.
@@ -146,6 +111,40 @@ export function createWorld({ random = Math.random, onFoodAdd, onFoodRemove } = 
     if (!worm.alive || worm.boostLeft > 0 || worm.cooldown > 0) return false;
     worm.boostLeft = RULES.boostSec;
     return true;
+  }
+
+  function move(worm, dt) {
+    const radius = radiusFor(worm.colors.length);
+    const turn = (RULES.turnRate / (1 + (radius - 9) * 0.05)) * dt;
+    const diff = Math.atan2(Math.sin(worm.target - worm.angle), Math.cos(worm.target - worm.angle));
+    worm.angle += Math.max(-turn, Math.min(turn, diff));
+
+    let speed = RULES.speed;
+    if (worm.boostLeft > 0) {
+      speed = RULES.boostSpeed;
+      worm.boostLeft -= dt;
+      if (worm.boostLeft <= 0) {
+        worm.boostLeft = 0;
+        worm.cooldown = RULES.boostCooldownSec;
+      }
+    } else if (worm.cooldown > 0) worm.cooldown = Math.max(0, worm.cooldown - dt);
+    if (worm.shield > 0) worm.shield = Math.max(0, worm.shield - dt);
+
+    let remain = speed * dt;
+    while (remain > 1e-9) {
+      const step = Math.min(remain, RULES.spacing - worm.carry);
+      worm.x += Math.cos(worm.angle) * step;
+      worm.y += Math.sin(worm.angle) * step;
+      worm.carry += step;
+      remain -= step;
+      if (worm.carry >= RULES.spacing - 1e-9) {
+        worm.carry = 0;
+        worm.trail.unshift({ x: worm.x, y: worm.y });
+        // 먹은 만큼 꼬리 끝에 그 먹이 색의 마디가 붙어요.
+        if (worm.pending.length) worm.colors.push(worm.pending.shift());
+        while (worm.trail.length > worm.colors.length + 1) worm.trail.pop();
+      }
+    }
   }
 
   function eat(worm, events) {
@@ -257,7 +256,7 @@ export function createWorld({ random = Math.random, onFoodAdd, onFoodRemove } = 
 
   function step(dt) {
     const events = [];
-    for (const worm of worms.values()) moveWorm(worm, dt);
+    for (const worm of worms.values()) move(worm, dt);
     indexBodies();
     collide(events);
     for (const worm of worms.values()) eat(worm, events);
